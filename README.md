@@ -6,12 +6,6 @@ acts as a primary boot loader for the [USB armory Mk II](https://github.com/f-se
 allowing boot of kernel images (e.g. Linux) from either the eMMC card or an
 external microSD card.
 
-Binary releases
-===============
-
-Pre-compiled binary releases are available
-[here](https://github.com/f-secure-foundry/armory-boot/releases).
-
 Compiling
 =========
 
