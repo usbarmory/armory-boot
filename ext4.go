@@ -17,7 +17,7 @@ import (
 
 	"github.com/dsoprea/go-ext4"
 
-	"github.com/f-secure-foundry/tamago/imx6/usdhc"
+	"github.com/f-secure-foundry/tamago/soc/imx6/usdhc"
 )
 
 type Partition struct {

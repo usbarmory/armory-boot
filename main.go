@@ -13,9 +13,9 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/f-secure-foundry/tamago/imx6"
-	"github.com/f-secure-foundry/tamago/imx6/usdhc"
-	"github.com/f-secure-foundry/tamago/usbarmory/mark-two"
+	"github.com/f-secure-foundry/tamago/soc/imx6"
+	"github.com/f-secure-foundry/tamago/soc/imx6/usdhc"
+	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 )
 
 var Build string
