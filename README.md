@@ -38,7 +38,7 @@ Installing
 ==========
 
 The `armory-boot.imx` file can be flashed on the internal eMMC card or an
-external micro SD card as shown in[these instructions](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#flashing-imx-native-images).
+external micro SD card as shown in [these instructions](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#flashing-imx-native-images).
 
 Configuration
 =============
