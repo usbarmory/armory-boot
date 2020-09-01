@@ -12,11 +12,34 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
+
+	"github.com/jedisct1/go-minisign"
 )
 
-func verify(buf []byte, s string) bool {
+const signatureSuffix = ".sig"
+
+var PublicKey string
+
+func verifySignature(bin []byte, s []byte) (valid bool, err error) {
+	sig, err := minisign.DecodeSignature(string(s))
+
+	if err != nil {
+		return false, fmt.Errorf("invalid signature, %v\n", err)
+	}
+
+	pub, err := minisign.NewPublicKey(PublicKey)
+
+	if err != nil {
+		return false, fmt.Errorf("invalid public key, %v\n", err)
+	}
+
+	return pub.Verify(bin, sig)
+}
+
+func verifyHash(bin []byte, s string) bool {
 	h := sha256.New()
-	h.Write(buf)
+	h.Write(bin)
 
 	hash, err := hex.DecodeString(s)
 

@@ -26,12 +26,23 @@ The `START` environment variable must be set to the offset of the first valid
 ext4 partition where `/boot/armory-boot.conf` is located (typically 5242880 for
 USB armory Mk II default pre-compiled images).
 
-Build the `armory-boot.imx` application executable (note that on secure booted
-units the `imx_signed` target should be used instead):
+Build the `armory-boot.imx` application executable:
 
 ```
 git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
 make CROSS_COMPILE=arm-none-eabi- imx BOOT=uSD START=5242880
+```
+
+On secure booted systems the optional `PUBLIC_KEY` environment variable can be
+set with a [minisign](https://jedisct1.github.io/minisign/) public key to
+enable configuration file signature verification.
+
+On secure booted sytems the `imx_signed` target should be used to create
+signed bootloader images:
+
+```
+git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
+make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=RWRss1L3Dg0fATqYIxCuCTgCiaoaIC0vYShv5DuwcXn3c1pDfGvpOY5Q
 ```
 
 Installing
@@ -62,6 +73,18 @@ Example `/boot/armory-boot.conf` configuration file:
   ],
   "cmdline": "console=ttymxc1,115200 root=/dev/mmcblk1p1 rootwait rw"
 }
+```
+
+When `armory-boot` is compiled with the `PUBLIC_KEY` variable signature for the
+configuration file must be created in `/boot/armory-boot.conf.sig` using
+[minisign](https://jedisct1.github.io/minisign/) with the corresponding secret
+key.
+
+Example signature generation:
+
+```
+minisign -G
+minisign -Sm armory-boot.conf -x armory-boot.conf.sig
 ```
 
 Authors

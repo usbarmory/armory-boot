@@ -11,6 +11,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 )
 
@@ -23,20 +24,18 @@ type Config struct {
 	Kernel         []string `json:"kernel"`
 	DeviceTreeBlob []string `json:"dtb"`
 	CmdLine        string   `json:"cmdline"`
+
+	conf []byte
 }
 
-//func GetConfig() *Config {
-//	return &conf
-//}
-
 func (c *Config) Read(partition *Partition, configPath string) (err error) {
-	b, err := partition.ReadAll(configPath)
+	c.conf, err = partition.ReadAll(configPath)
 
 	if err != nil {
 		return
 	}
 
-	err = json.Unmarshal(b, &c)
+	err = json.Unmarshal(c.conf, &c)
 
 	if err != nil {
 		return
@@ -51,6 +50,16 @@ func (c *Config) Read(partition *Partition, configPath string) (err error) {
 	}
 
 	return
+}
+
+func (c *Config) Verify(partition *Partition, sigPath string) (valid bool, err error) {
+	sig, err := partition.ReadAll(sigPath)
+
+	if err != nil {
+		return false, fmt.Errorf("invalid signature path, %v\n", err)
+	}
+
+	return verifySignature(c.conf, sig)
 }
 
 func (c *Config) Print() {

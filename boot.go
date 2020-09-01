@@ -12,9 +12,9 @@ import (
 	"fmt"
 
 	"github.com/f-secure-foundry/tamago/arm"
+	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 	"github.com/f-secure-foundry/tamago/dma"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
-	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 )
 
 // defined in boot.s

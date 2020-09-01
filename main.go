@@ -13,9 +13,9 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
 	"github.com/f-secure-foundry/tamago/soc/imx6/usdhc"
-	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 )
 
 var Build string
@@ -48,7 +48,7 @@ func main() {
 	}
 
 	if err := card.Detect(); err != nil {
-		panic(err)
+		panic(fmt.Sprintf("card detect error: %v\n", err))
 	}
 
 	usbarmory.LED("white", true)
@@ -56,7 +56,7 @@ func main() {
 	offset, err := strconv.ParseInt(Start, 10, 64)
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("invalid start offset: %v\n", err))
 	}
 
 	partition := &Partition{
@@ -67,19 +67,32 @@ func main() {
 	err = conf.Read(partition, defaultConfigPath)
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("invalid configuration: %v\n", err))
+	}
+
+	if len(PublicKey) > 0 {
+		log.Printf("armory-boot: verifying %s", defaultConfigPath)
+		valid, err := conf.Verify(partition, defaultConfigPath+signatureSuffix)
+
+		if err != nil {
+			panic(fmt.Sprintf("configuration verification error: %v\n", err))
+		}
+
+		if !valid {
+			panic("invalid configuration signature")
+		}
 	}
 
 	kernel, err := partition.ReadAll(conf.Kernel[0])
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("invalid kernel path: %v\n", err))
 	}
 
 	dtb, err := partition.ReadAll(conf.DeviceTreeBlob[0])
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("invalid dtb path: %v\n", err))
 	}
 
 	usbarmory.LED("blue", true)
@@ -90,23 +103,21 @@ func main() {
 
 	log.Printf("armory-boot: verifying kernel %s", conf.Kernel[1])
 
-	if !verify(kernel, conf.Kernel[1]) {
+	if !verifyHash(kernel, conf.Kernel[1]) {
 		panic("invalid kernel hash")
 	}
 
 	log.Printf("armory-boot: verifying dtb %s", conf.DeviceTreeBlob[1])
 
-	if !verify(dtb, conf.DeviceTreeBlob[1]) {
+	if !verifyHash(dtb, conf.DeviceTreeBlob[1]) {
 		panic("invalid dtb hash")
 	}
 
 	dtb, err = fixupDeviceTree(dtb, conf.CmdLine)
 
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("dtb fixup error: %v\n", err))
 	}
-
-	// TODO: verify configuration signature
 
 	boot(kernel, dtb, conf.CmdLine)
 }
