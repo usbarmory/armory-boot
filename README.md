@@ -33,11 +33,12 @@ git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
 make CROSS_COMPILE=arm-none-eabi- imx BOOT=uSD START=5242880
 ```
 
-On secure booted systems the `imx_signed` target should be used to create signed
-bootloader images. To maintain the chain of trust, the `PUBLIC_KEY` environment
-variable can be set with either a [signify](https://man.openbsd.org/signify) or
-[minisign](https://jedisct1.github.io/minisign/) public key to enable
-configuration file signature verification.
+On secure booted systems the `imx_signed` target should be used instead with the relevant
+[`HAB_KEYS`](https://github.com/f-secure-foundry/usbarmory/wiki/Secure-boot-(Mk-II)) set.
+
+Additionally, to maintain the chain of trust, the `PUBLIC_KEY` environment variable must be
+set with either a [signify](https://man.openbsd.org/signify) or [minisign](https://jedisct1.github.io/minisign/)
+public key to enable configuration file signature verification.
 
 Example key generation (signify):
 
@@ -54,7 +55,7 @@ minisign -G -p armory-boot.pub -s armory-boot.sec
 Compilation with embedded key:
 
 ```
-make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of ${KEYS_PATH}/armory-boot.pub>
+make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
 ```
 
 Installing
