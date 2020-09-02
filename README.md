@@ -33,31 +33,6 @@ git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
 make CROSS_COMPILE=arm-none-eabi- imx BOOT=uSD START=5242880
 ```
 
-On secure booted systems the `imx_signed` target should be used instead with the relevant
-[`HAB_KEYS`](https://github.com/f-secure-foundry/usbarmory/wiki/Secure-boot-(Mk-II)) set.
-
-Additionally, to maintain the chain of trust, the `PUBLIC_KEY` environment variable must be
-set with either a [signify](https://man.openbsd.org/signify) or [minisign](https://jedisct1.github.io/minisign/)
-public key to enable configuration file signature verification.
-
-Example key generation (signify):
-
-```
-signify -G -p armory-boot.pub -s armory-boot.sec
-```
-
-Example key generation (minisign):
-
-```
-minisign -G -p armory-boot.pub -s armory-boot.sec
-```
-
-Compilation with embedded key:
-
-```
-make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
-```
-
 Installing
 ==========
 
@@ -88,11 +63,38 @@ Example `/boot/armory-boot.conf` configuration file:
 }
 ```
 
-When `armory-boot` is compiled with the `PUBLIC_KEY` variable, the signature
-for the configuration file must be created in `/boot/armory-boot.conf.sig`
-using either [signify](https://man.openbsd.org/signify) or
-[minisign](https://jedisct1.github.io/minisign/) with the corresponding secret
-key.
+Secure Boot
+===========
+
+On secure booted systems the `imx_signed` target should be used instead with the relevant
+[`HAB_KEYS`](https://github.com/f-secure-foundry/usbarmory/wiki/Secure-boot-(Mk-II)) set.
+
+Additionally, to maintain the chain of trust, the `PUBLIC_KEY` environment
+variable must be set with either a [signify](https://man.openbsd.org/signify)
+or [minisign](https://jedisct1.github.io/minisign/) public key to enable
+configuration file signature verification.
+
+Example key generation (signify):
+
+```
+signify -G -p armory-boot.pub -s armory-boot.sec
+```
+
+Example key generation (minisign):
+
+```
+minisign -G -p armory-boot.pub -s armory-boot.sec
+```
+
+Compilation with embedded key:
+
+```
+make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
+```
+
+When `armory-boot` is compiled with the `PUBLIC_KEY` variable, a signature for
+the configuration file must be created in `/boot/armory-boot.conf.sig` using
+with the corresponding secret key.
 
 Example signature generation (signify):
 
