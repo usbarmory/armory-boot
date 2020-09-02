@@ -11,7 +11,7 @@ TEXT ·svc(SB),$0
 	WORD	$0xef000001	// svc 0x00000001
 
 // func exec(kernel uint32, params uint32)
-TEXT ·exec(SB),$0
+TEXT ·exec(SB),$0-8
 	MOVW	kernel+0(FP), R3
 	MOVW	params+4(FP), R4
 

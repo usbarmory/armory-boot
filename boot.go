@@ -18,7 +18,7 @@ import (
 )
 
 // defined in boot.s
-func exec(uint32, uint32)
+func exec(kernel uint32, params uint32)
 func svc()
 
 func boot(kernel []byte, dtb []byte, cmdline string) {
