@@ -70,7 +70,7 @@ func main() {
 		panic(fmt.Sprintf("invalid configuration: %v\n", err))
 	}
 
-	if len(PublicKey) > 0 {
+	if len(PublicKeyStr) > 0 {
 		log.Printf("armory-boot: verifying %s", defaultConfigPath)
 		valid, err := conf.Verify(partition, defaultConfigPath+signatureSuffix)
 

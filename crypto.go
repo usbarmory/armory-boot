@@ -13,22 +13,20 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-
-	"github.com/jedisct1/go-minisign"
 )
 
 const signatureSuffix = ".sig"
 
-var PublicKey string
+var PublicKeyStr string
 
 func verifySignature(bin []byte, s []byte) (valid bool, err error) {
-	sig, err := minisign.DecodeSignature(string(s))
+	sig, err := DecodeSignature(string(s))
 
 	if err != nil {
 		return false, fmt.Errorf("invalid signature, %v\n", err)
 	}
 
-	pub, err := minisign.NewPublicKey(PublicKey)
+	pub, err := NewPublicKey(PublicKeyStr)
 
 	if err != nil {
 		return false, fmt.Errorf("invalid public key, %v\n", err)

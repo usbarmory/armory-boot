@@ -33,12 +33,11 @@ git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
 make CROSS_COMPILE=arm-none-eabi- imx BOOT=uSD START=5242880
 ```
 
-On secure booted systems the optional `PUBLIC_KEY` environment variable can be
-set with a [minisign](https://jedisct1.github.io/minisign/) public key to
-enable configuration file signature verification.
-
-On secure booted sytems the `imx_signed` target should be used to create
-signed bootloader images:
+On secure booted systems the `imx_signed` target should be used to create signed
+bootloader images. To maintain the chain of trust, the `PUBLIC_KEY` environment
+variable can be set with either a [signify](https://man.openbsd.org/signify) or
+[minisign](https://jedisct1.github.io/minisign/) public key to enable
+configuration file signature verification.
 
 ```
 git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
@@ -75,16 +74,24 @@ Example `/boot/armory-boot.conf` configuration file:
 }
 ```
 
-When `armory-boot` is compiled with the `PUBLIC_KEY` variable signature for the
-configuration file must be created in `/boot/armory-boot.conf.sig` using
+When `armory-boot` is compiled with the `PUBLIC_KEY` variable, the signature
+for the configuration file must be created in `/boot/armory-boot.conf.sig`
+using either [signify](https://man.openbsd.org/signify) or
 [minisign](https://jedisct1.github.io/minisign/) with the corresponding secret
 key.
 
-Example signature generation:
+Example signature generation (signify):
+
+```
+signify -G -p armory-boot.pub -s armory-boot.sec
+signify -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
+```
+
+Example signature generation (minisign):
 
 ```
 minisign -G
-minisign -Sm armory-boot.conf -x armory-boot.conf.sig
+minisign -S -m armory-boot.conf -x armory-boot.conf.sig
 ```
 
 Authors

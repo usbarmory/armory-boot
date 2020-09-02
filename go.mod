@@ -9,5 +9,6 @@ require (
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/jedisct1/go-minisign v0.0.0-20190909160543-45766022959e
 	github.com/u-root/u-root v6.0.0+incompatible
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 )
