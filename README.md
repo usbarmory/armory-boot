@@ -39,9 +39,22 @@ variable can be set with either a [signify](https://man.openbsd.org/signify) or
 [minisign](https://jedisct1.github.io/minisign/) public key to enable
 configuration file signature verification.
 
+Example key generation (signify):
+
 ```
-git clone https://github.com/f-secure-foundry/armory-boot && cd armory-boot
-make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=RWRss1L3Dg0fATqYIxCuCTgCiaoaIC0vYShv5DuwcXn3c1pDfGvpOY5Q
+signify -G -p armory-boot.pub -s armory-boot.sec
+```
+
+Example key generation (minisign):
+
+```
+minisign -G -p armory-boot.pub -s armory-boot.sec
+```
+
+Compilation with embedded key:
+
+```
+make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of ${KEYS_PATH}/armory-boot.pub>
 ```
 
 Installing
@@ -83,14 +96,12 @@ key.
 Example signature generation (signify):
 
 ```
-signify -G -p armory-boot.pub -s armory-boot.sec
 signify -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
 ```
 
 Example signature generation (minisign):
 
 ```
-minisign -G -p armory-boot.pub -s armory-boot.sec
 minisign -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
 ```
 
