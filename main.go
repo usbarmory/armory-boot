@@ -64,14 +64,11 @@ func main() {
 		Offset: offset,
 	}
 
-	err = conf.Read(partition, defaultConfigPath)
-
-	if err != nil {
+	if err = conf.Read(partition, defaultConfigPath); err != nil {
 		panic(fmt.Sprintf("invalid configuration: %v\n", err))
 	}
 
 	if len(PublicKeyStr) > 0 {
-		log.Printf("armory-boot: verifying %s", defaultConfigPath)
 		valid, err := conf.Verify(partition, defaultConfigPath+signatureSuffix)
 
 		if err != nil {
@@ -97,17 +94,9 @@ func main() {
 
 	usbarmory.LED("blue", true)
 
-	log.Printf("armory-boot: kernel %s (%d bytes)\n", conf.Kernel[0], len(kernel))
-	log.Printf("armory-boot: dtb %s (%d bytes)\n", conf.DeviceTreeBlob[0], len(dtb))
-	log.Printf("armory-boot: cmdline %s\n", conf.CmdLine)
-
-	log.Printf("armory-boot: verifying kernel %s", conf.Kernel[1])
-
 	if !verifyHash(kernel, conf.Kernel[1]) {
 		panic("invalid kernel hash")
 	}
-
-	log.Printf("armory-boot: verifying dtb %s", conf.DeviceTreeBlob[1])
 
 	if !verifyHash(dtb, conf.DeviceTreeBlob[1]) {
 		panic("invalid dtb hash")

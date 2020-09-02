@@ -29,6 +29,8 @@ type Config struct {
 }
 
 func (c *Config) Read(partition *Partition, configPath string) (err error) {
+	log.Printf("armory-boot: reading configuration at %s\n", configPath)
+
 	c.conf, err = partition.ReadAll(configPath)
 
 	if err != nil {
@@ -49,10 +51,14 @@ func (c *Config) Read(partition *Partition, configPath string) (err error) {
 		return errors.New("invalid kernel parameter size")
 	}
 
+	c.Print()
+
 	return
 }
 
 func (c *Config) Verify(partition *Partition, sigPath string) (valid bool, err error) {
+	log.Println("armory-boot: verifying configuration signature")
+
 	sig, err := partition.ReadAll(sigPath)
 
 	if err != nil {
@@ -64,7 +70,5 @@ func (c *Config) Verify(partition *Partition, sigPath string) (valid bool, err e
 
 func (c *Config) Print() {
 	j, _ := json.MarshalIndent(c, "", "\t")
-
-	log.Println("applied configuration:")
 	log.Printf("\n%s", string(j))
 }
