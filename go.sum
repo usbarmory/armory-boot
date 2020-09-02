@@ -2,8 +2,8 @@ github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8 h1:e3CYZInWqO0a3MW
 github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8/go.mod h1:UBig4B62vBWtudYo4RJPwdV5Lqo+oeh7AtSCmRIkRPc=
 github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd h1:l+vLbuxptsC6VQyQsfD7NnEC8BZuFpz45PgY+pH8YTg=
 github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd/go.mod h1:7I+3Pe2o/YSU88W0hWlm9S22W7XI1JFNJ86U0zPKMf8=
-github.com/f-secure-foundry/tamago v0.0.0-20200901141039-fa63969c7407 h1:u/8aDO2XmL0ov8hIkC+L8XobZlC+mKqxD/qSUfaAsqo=
-github.com/f-secure-foundry/tamago v0.0.0-20200901141039-fa63969c7407/go.mod h1:+xmhdYxGfaNhWUZ/F1mbwFu38H73slg/k/oPjOL7tc8=
+github.com/f-secure-foundry/tamago v0.0.0-20200902181010-9a0858f1083d h1:X30+UUu15hn8sZznyg2CPsQ3Kx2W2mF2uUTFXjKF/80=
+github.com/f-secure-foundry/tamago v0.0.0-20200902181010-9a0858f1083d/go.mod h1:+xmhdYxGfaNhWUZ/F1mbwFu38H73slg/k/oPjOL7tc8=
 github.com/go-errors/errors v1.0.2 h1:xMxH9j2fNg/L4hLn/4y3M0IUsn0M6Wbu/Uh9QlOfBh4=
 github.com/go-errors/errors v1.0.2/go.mod h1:psDX2osz5VnTOnFWbDeWwS7yejl+uV3FEWEp4lssFEs=
 github.com/go-errors/errors v1.1.1 h1:ljK/pL5ltg3qoN+OtN6yCv9HWSfMwxSx90GJCZQxYNg=
