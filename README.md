@@ -90,8 +90,8 @@ signify -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
 Example signature generation (minisign):
 
 ```
-minisign -G
-minisign -S -m armory-boot.conf -x armory-boot.conf.sig
+minisign -G -p armory-boot.pub -s armory-boot.sec
+minisign -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
 ```
 
 Authors
