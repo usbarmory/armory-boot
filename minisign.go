@@ -103,7 +103,7 @@ func (publicKey *PublicKey) Verify(bin []byte, signature Signature) (bool, error
 		return false, errors.New("Invalid signature")
 	}
 
-	if len(signature.TrustedComment) != 0 || len(signature.GlobalSignature) != 0 {
+	if len(signature.TrustedComment) != 0 {
 		if !strings.HasPrefix(signature.TrustedComment, "trusted comment: ") {
 			return false, errors.New("Unexpected format for the trusted comment")
 		}
