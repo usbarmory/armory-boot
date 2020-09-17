@@ -62,7 +62,7 @@ func (c *Config) Verify(partition *Partition, sigPath string) (valid bool, err e
 	sig, err := partition.ReadAll(sigPath)
 
 	if err != nil {
-		return false, fmt.Errorf("invalid signature path, %v\n", err)
+		return false, fmt.Errorf("invalid signature path, %v", err)
 	}
 
 	return verifySignature(c.conf, sig)
