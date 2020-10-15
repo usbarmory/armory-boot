@@ -19,11 +19,8 @@ APP := armory-boot
 GOENV := GO_EXTLINK_ENABLED=0 CGO_ENABLED=0 GOOS=tamago GOARM=7 GOARCH=arm
 TEXT_START := 0x90010000 # ramStart (defined in imx6/imx6ul/memory.go) + 0x10000
 GOFLAGS := -tags linkramsize,linkramstart -ldflags "-s -w -T $(TEXT_START) -E _rt0_arm_tamago -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
-QEMU ?= qemu-system-arm -machine mcimx6ul-evk -cpu cortex-a7 -m 512M \
-        -nographic -monitor none -serial null -serial stdio -net none \
-        -semihosting -d unimp
 
-.PHONY: clean qemu qemu-gdb
+.PHONY: clean
 
 #### primary targets ####
 
@@ -72,12 +69,6 @@ clean:
 	rm -f $(APP)
 	@rm -fr $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd
 
-qemu: $(APP)
-	$(QEMU) -kernel $(APP)
-
-qemu-gdb: $(APP)
-	$(QEMU) -kernel $(APP) -S -s
-
 #### dependencies ####
 
 $(APP): check_tamago check_env
@@ -85,14 +76,14 @@ $(APP): check_tamago check_env
 
 $(APP).dcd: check_tamago
 $(APP).dcd: GOMODCACHE=$(shell ${TAMAGO} env GOMODCACHE)
-$(APP).dcd: TAMAGO_PKG=$(shell grep "github.com/f-secure-foundry/tamago " go.mod | awk '{print $$1"@"$$2}')
+$(APP).dcd: TAMAGO_PKG=$(shell grep "github.com/f-secure-foundry/tamago v" go.mod | awk '{print $$1"@"$$2}')
 $(APP).dcd: dcd
 
 $(APP).bin: $(APP)
 	$(CROSS_COMPILE)objcopy -j .text -j .rodata -j .shstrtab -j .typelink \
 	    -j .itablink -j .gopclntab -j .go.buildinfo -j .noptrdata -j .data \
 	    -j .bss --set-section-flags .bss=alloc,load,contents \
-	    -j .noptrbss --set-section-flags .noptrbss=alloc,load,contents\
+	    -j .noptrbss --set-section-flags .noptrbss=alloc,load,contents \
 	    $(APP) -O binary $(APP).bin
 
 $(APP).imx: $(APP).bin $(APP).dcd
