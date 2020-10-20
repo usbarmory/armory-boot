@@ -9,16 +9,21 @@
 BUILD_USER = $(shell whoami)
 BUILD_HOST = $(shell hostname)
 BUILD_DATE = $(shell /bin/date -u "+%Y-%m-%d %H:%M:%S")
+BUILD_TAGS = linkramsize,linkramstart
 BUILD = ${BUILD_USER}@${BUILD_HOST} on ${BUILD_DATE}
 REV = $(shell git rev-parse --short HEAD 2> /dev/null)
 
 SHELL = /bin/bash
 START ?= 5242880
 
+ifeq ("${CONSOLE}","on")
+	BUILD_TAGS := ${BUILD_TAGS},console
+endif
+
 APP := armory-boot
 GOENV := GO_EXTLINK_ENABLED=0 CGO_ENABLED=0 GOOS=tamago GOARM=7 GOARCH=arm
 TEXT_START := 0x90010000 # ramStart (defined in imx6/imx6ul/memory.go) + 0x10000
-GOFLAGS := -tags linkramsize,linkramstart -ldflags "-s -w -T $(TEXT_START) -E _rt0_arm_tamago -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
+GOFLAGS := -tags ${BUILD_TAGS} -ldflags "-s -w -T $(TEXT_START) -E _rt0_arm_tamago -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
 
 .PHONY: clean
 

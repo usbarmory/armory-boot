@@ -26,6 +26,10 @@ The `START` environment variable must be set to the offset of the first valid
 ext4 partition where `/boot/armory-boot.conf` is located (typically 5242880 for
 USB armory Mk II default pre-compiled images).
 
+The `CONSOLE` environment variable must be set to `on` to enable serial
+logging when a [debug accessory](https://github.com/f-secure-foundry/usbarmory/tree/master/hardware/mark-two-debug-accessory)
+is connected.
+
 Build the `armory-boot.imx` application executable:
 
 ```
