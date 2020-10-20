@@ -54,7 +54,6 @@ Example `/boot/armory-boot.conf` configuration file:
 
 ```
 {
-  "debug": false,
   "kernel": [
     "/boot/zImage-5.4.51-0-usbarmory",
     "aceb3514d5ba6ac591a7d5f2cad680e83a9f848d19763563da8024f003e927c7"

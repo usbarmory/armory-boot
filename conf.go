@@ -20,7 +20,6 @@ const defaultConfigPath = "/boot/armory-boot.conf"
 var conf Config
 
 type Config struct {
-	Debug          bool     `json:"debug"`
 	Kernel         []string `json:"kernel"`
 	DeviceTreeBlob []string `json:"dtb"`
 	CmdLine        string   `json:"cmdline"`
