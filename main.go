@@ -80,33 +80,52 @@ func main() {
 		}
 	}
 
-	kernel, err := partition.ReadAll(conf.Kernel[0])
+	switch {
+	case len(conf.Kernel) > 0:
+		fmt.Println("Loaded kernel config")
+		kernel, err := partition.ReadAll(conf.Kernel[0])
+		if err != nil {
+			panic(fmt.Sprintf("invalid kernel path: %v\n", err))
+		}
 
-	if err != nil {
-		panic(fmt.Sprintf("invalid kernel path: %v\n", err))
+		dtb, err := partition.ReadAll(conf.DeviceTreeBlob[0])
+		if err != nil {
+			panic(fmt.Sprintf("invalid dtb path: %v\n", err))
+		}
+
+		usbarmory.LED("blue", true)
+
+		if !verifyHash(kernel, conf.Kernel[1]) {
+			panic("invalid kernel hash")
+		}
+
+		if !verifyHash(dtb, conf.DeviceTreeBlob[1]) {
+			panic("invalid dtb hash")
+		}
+
+		dtb, err = fixupDeviceTree(dtb, conf.CmdLine)
+
+		if err != nil {
+			panic(fmt.Sprintf("dtb fixup error: %v\n", err))
+		}
+
+		bootKernel(kernel, dtb, conf.CmdLine)
+
+	case len(conf.Unikernel) > 0:
+		fmt.Println("Loaded unikernel config")
+		unikernel, err := partition.ReadAll(conf.Unikernel[0])
+		if err != nil {
+			panic(fmt.Sprintf("invalid unikernel path: %v\n", err))
+		}
+
+		usbarmory.LED("blue", true)
+
+		if !verifyHash(unikernel, conf.Unikernel[1]) {
+			panic("invalid unikernel hash")
+		}
+
+		bootELFUnikernel(unikernel)
+	default:
+		panic("invalid config")
 	}
-
-	dtb, err := partition.ReadAll(conf.DeviceTreeBlob[0])
-
-	if err != nil {
-		panic(fmt.Sprintf("invalid dtb path: %v\n", err))
-	}
-
-	usbarmory.LED("blue", true)
-
-	if !verifyHash(kernel, conf.Kernel[1]) {
-		panic("invalid kernel hash")
-	}
-
-	if !verifyHash(dtb, conf.DeviceTreeBlob[1]) {
-		panic("invalid dtb hash")
-	}
-
-	dtb, err = fixupDeviceTree(dtb, conf.CmdLine)
-
-	if err != nil {
-		panic(fmt.Sprintf("dtb fixup error: %v\n", err))
-	}
-
-	boot(kernel, dtb, conf.CmdLine)
 }
