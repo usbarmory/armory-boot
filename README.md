@@ -47,7 +47,7 @@ Configuration
 =============
 
 The bootloader expects a single configuration file to read information on the
-image and parmeters to boot.
+image and parameters to boot.
 
 The bootloader is configured via a single configuration file, and can boot either
  an ARM kernel image or an ELF unikernel (e.g.
@@ -56,7 +56,7 @@ The required elements in the configuration file differ depending on the type of
 image being loaded, examples for both are given below.
 
 It is an error specify both unikernel and kernel config parameters in the same
-configureation file.
+configuration file.
 
 ### Kernel
 To load a kernel, the bootloader requires that you provide the paths to the
