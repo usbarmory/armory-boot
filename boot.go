@@ -17,6 +17,7 @@ import (
 	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 	"github.com/f-secure-foundry/tamago/dma"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
+	"github.com/f-secure-foundry/tamago/soc/imx6/rngb"
 )
 
 // defined in boot.s
@@ -45,7 +46,7 @@ func bootKernel(kernel []byte, dtb []byte, cmdline string) {
 
 		// Linux RNGB driver doesn't play well with a previously
 		// initialized RNGB, therefore reset it.
-		imx6.RNGB.Reset()
+		rngb.Reset()
 
 		imx6.ARM.InterruptsDisable()
 		imx6.ARM.CacheFlushData()
@@ -60,26 +61,32 @@ func bootKernel(kernel []byte, dtb []byte, cmdline string) {
 // bootELFUnikernel attempts to load the provided ELF image and jumps to it.
 //
 // This function implements a _very_ simple ELF loader which is suitable for
-// loading bare-metal ELF files like those produced by Tamago.
+// loading bare-metal ELF files like those produced by TamaGo.
 func bootELFUnikernel(img []byte) {
 	dma.Init(dmaStart, dmaSize)
 	mem, _ := dma.Reserve(dmaSize, 0)
 
 	f, err := elf.NewFile(bytes.NewReader(img))
+
 	if err != nil {
 		panic(err.Error)
 	}
 
 	for idx, prg := range f.Progs {
-		if prg.Type == elf.PT_LOAD {
-			b := make([]byte, prg.Memsz)
-			_, err := prg.ReadAt(b[0:prg.Filesz], 0)
-			if err != nil {
-				panic(fmt.Sprintf("Failed to read LOAD section at idx %d: %q", idx, err))
-			}
-			offset := uint32(prg.Paddr) - mem
-			dma.Write(mem, b, int(offset))
+		if prg.Type != elf.PT_LOAD {
+			continue
 		}
+
+		b := make([]byte, prg.Memsz)
+
+		_, err := prg.ReadAt(b[0:prg.Filesz], 0)
+
+		if err != nil {
+			panic(fmt.Sprintf("armory-boot: failed to read LOAD section at idx %d: %q", idx, err))
+		}
+
+		offset := uint32(prg.Paddr) - mem
+		dma.Write(mem, b, int(offset))
 	}
 
 	entry := f.Entry
@@ -89,15 +96,15 @@ func bootELFUnikernel(img []byte) {
 			panic("unhandled exception")
 		}
 
-		fmt.Printf("armory-boot: starting unikernel elf image@%x\n", entry)
+		fmt.Printf("armory-boot: starting unikernel image@%x\n", entry)
 
 		usbarmory.LED("blue", false)
 		usbarmory.LED("white", false)
 
 		// TODO(al): There's some issue around the hw rng at the moment:
-		//           RNGB.Init() will hang waiting for the RNG to finish
+		//           rngb.Init() will hang waiting for the RNG to finish
 		//           reseeding.
-		// imx6.RNGB.Reset()
+		// rngb.Reset()
 
 		imx6.ARM.InterruptsDisable()
 		imx6.ARM.CacheFlushData()

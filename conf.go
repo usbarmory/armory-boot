@@ -50,8 +50,8 @@ func (c *Config) Read(partition *Partition, configPath string) (err error) {
 	}
 
 	ul, kl := len(conf.Unikernel), len(conf.Kernel)
-
 	isUnikernel, isKernel := ul > 0, kl > 0
+
 	if isUnikernel == isKernel {
 		return errors.New("must specify either unikernel or kernel")
 	}
@@ -70,7 +70,7 @@ func (c *Config) Read(partition *Partition, configPath string) (err error) {
 			return errors.New("invalid unikernel parameter size")
 		}
 	default:
-		panic("logic error: config is neither for kernel nor unikernel")
+		panic("armory-boot: config is neither for kernel nor unikernel")
 	}
 
 	c.Print()

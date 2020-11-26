@@ -58,12 +58,14 @@ image being loaded, examples for both are given below.
 It is an error specify both unikernel and kernel config parameters in the same
 configuration file.
 
-### Kernel
-To load a kernel, the bootloader requires that you provide the paths to the
-kernel image and the Device Tree Blob file, along with their respective
+Linux kernel boot
+-----------------
+
+To load a Linux kernel, the bootloader requires that you provide the paths to
+the kernel image and the Device Tree Blob file, along with their respective
 SHA256 hashes for validation, as well as the kernel command line.
 
-Example `/boot/armory-boot.conf` configuration file for loading a kernel:
+Example `/boot/armory-boot.conf` configuration file for loading a Linux kernel:
 
 ```
 {
@@ -79,14 +81,17 @@ Example `/boot/armory-boot.conf` configuration file for loading a kernel:
 }
 ```
 
-### ELF Unikernel
+TamaGo unikernel boot
+---------------------
+
 > :warning: this is currently experimental, and requires that the HW RNG is
 > not reinitialised.
 
-To load an ELF Unikernel, the bootloader only needs the path to the unikernel
-image file along with its SHA256 hash for validation.
+To load a TamaGo unikernel, the bootloader only needs the path to the ELF
+binary along with its SHA256 hash for validation.
 
-Example `/boot/armory-boot.conf` configuration file for loading an ELF unikernel:
+Example `/boot/armory-boot.conf` configuration file for loading a TamaGo
+unikernel:
 
 ```
 {
