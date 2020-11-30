@@ -147,6 +147,19 @@ Example signature generation (minisign):
 minisign -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
 ```
 
+LED status
+==========
+
+The [USB armory Mk II](https://github.com/f-secure-foundry/usbarmory/wiki) LEDs
+are used, in sequence, as follows:
+
+| Boot sequence                   | Blue | White |
+|---------------------------------|------|-------|
+| 0. initialization               | off  | off   |
+| 1. boot media detected          | on   | off   |
+| 2. kernel verification complete | on   | on    |
+| 3. jumping to kernel image      | off  | off   |
+
 Authors
 =======
 

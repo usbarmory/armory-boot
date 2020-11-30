@@ -15,24 +15,20 @@ import (
 	"fmt"
 )
 
-const signatureSuffix = ".sig"
-
-var PublicKeyStr string
-
-func verifySignature(bin []byte, s []byte) (valid bool, err error) {
-	sig, err := DecodeSignature(string(s))
+func verifySignature(bin []byte, sig []byte, pubKey string) (valid bool, err error) {
+	s, err := DecodeSignature(string(sig))
 
 	if err != nil {
 		return false, fmt.Errorf("invalid signature, %v", err)
 	}
 
-	pub, err := NewPublicKey(PublicKeyStr)
+	pub, err := NewPublicKey(pubKey)
 
 	if err != nil {
 		return false, fmt.Errorf("invalid public key, %v", err)
 	}
 
-	return pub.Verify(bin, sig)
+	return pub.Verify(bin, s)
 }
 
 func verifyHash(bin []byte, s string) bool {

@@ -14,8 +14,8 @@ import (
 	"strconv"
 
 	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
+	"github.com/f-secure-foundry/tamago/dma"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
-	"github.com/f-secure-foundry/tamago/soc/imx6/usdhc"
 )
 
 var Build string
@@ -24,108 +24,98 @@ var Revision string
 var Boot string
 var Start string
 
+var PublicKeyStr string
+
+var partition *Partition
+
 func init() {
-	log.SetFlags(0)
-
-	if err := imx6.SetARMFreq(900); err != nil {
-		panic(fmt.Sprintf("WARNING: error setting ARM frequency: %v\n", err))
-	}
-}
-
-func main() {
 	usbarmory.LED("blue", false)
 	usbarmory.LED("white", false)
 
-	var card *usdhc.USDHC
+	log.SetFlags(0)
 
-	switch Boot {
-	case "eMMC":
-		card = usbarmory.MMC
-	case "uSD":
-		card = usbarmory.SD
-	default:
-		panic("invalid boot parameter")
+	if err := imx6.SetARMFreq(900); err != nil {
+		panic(fmt.Sprintf("cannot change ARM frequency, %v\n", err))
 	}
-
-	if err := card.Detect(); err != nil {
-		panic(fmt.Sprintf("card detect error: %v\n", err))
-	}
-
-	usbarmory.LED("white", true)
 
 	offset, err := strconv.ParseInt(Start, 10, 64)
 
 	if err != nil {
-		panic(fmt.Sprintf("invalid start offset: %v\n", err))
+		panic(fmt.Sprintf("invalid start offset, %v\n", err))
 	}
 
-	partition := &Partition{
-		Card:   card,
+	partition = &Partition{
 		Offset: offset,
 	}
 
-	if err = conf.Read(partition, defaultConfigPath); err != nil {
-		panic(fmt.Sprintf("invalid configuration: %v\n", err))
+	switch Boot {
+	case "eMMC":
+		partition.Card = usbarmory.MMC
+	case "uSD":
+		partition.Card = usbarmory.SD
+	default:
+		panic("invalid boot parameter")
+	}
+}
+
+func main() {
+	if err := partition.Card.Detect(); err != nil {
+		panic(fmt.Sprintf("boot media error, %v\n", err))
+	}
+
+	usbarmory.LED("blue", true)
+
+	if err := conf.Init(partition, defaultConfigPath); err != nil {
+		panic(fmt.Sprintf("configuration error, %v\n", err))
 	}
 
 	if len(PublicKeyStr) > 0 {
-		valid, err := conf.Verify(partition, defaultConfigPath+signatureSuffix)
+		valid, err := conf.Verify(defaultConfigPath+signatureSuffix, PublicKeyStr)
 
 		if err != nil {
-			panic(fmt.Sprintf("configuration verification error: %v\n", err))
+			panic(fmt.Sprintf("configuration error, %v\n", err))
 		}
 
 		if !valid {
-			panic("invalid configuration signature")
+			panic("configuration error, invalid signature")
 		}
+	} else {
+		log.Printf("armory-boot: no public key, skipping signature verification")
 	}
 
-	switch {
-	case len(conf.Kernel) > 0:
-		fmt.Println("Loaded kernel config")
-		kernel, err := partition.ReadAll(conf.Kernel[0])
-		if err != nil {
-			panic(fmt.Sprintf("invalid kernel path: %v\n", err))
-		}
+	err := conf.Load()
 
-		dtb, err := partition.ReadAll(conf.DeviceTreeBlob[0])
-		if err != nil {
-			panic(fmt.Sprintf("invalid dtb path: %v\n", err))
-		}
+	if err != nil {
+		panic(fmt.Sprintf("configuration error, %v\n", err))
+	}
 
-		usbarmory.LED("blue", true)
+	if !verifyHash(conf.kernel, conf.kernelHash) {
+		panic("invaid kernel hash")
+	}
 
-		if !verifyHash(kernel, conf.Kernel[1]) {
-			panic("invalid kernel hash")
-		}
-
-		if !verifyHash(dtb, conf.DeviceTreeBlob[1]) {
+	if len(conf.params) > 0 {
+		if !verifyHash(conf.params, conf.paramsHash) {
 			panic("invalid dtb hash")
 		}
 
-		dtb, err = fixupDeviceTree(dtb, conf.CmdLine)
+		conf.params, err = fixupDeviceTree(conf.params, conf.CmdLine)
 
 		if err != nil {
-			panic(fmt.Sprintf("dtb fixup error: %v\n", err))
+			panic(fmt.Sprintf("dtb fixup error, %v\n", err))
 		}
+	}
 
-		bootKernel(kernel, dtb, conf.CmdLine)
+	usbarmory.LED("white", true)
 
-	case len(conf.Unikernel) > 0:
-		fmt.Println("Loaded unikernel config")
-		unikernel, err := partition.ReadAll(conf.Unikernel[0])
-		if err != nil {
-			panic(fmt.Sprintf("invalid unikernel path: %v\n", err))
-		}
+	dma.Init(dmaStart, dmaSize)
+	mem, _ := dma.Reserve(dmaSize, 0)
 
-		usbarmory.LED("blue", true)
+	if conf.elf {
+		boot(loadELF(mem, conf.kernel), 0)
+	} else {
+		dma.Write(mem, conf.kernel, kernelOffset)
+		dma.Write(mem, conf.params, paramsOffset)
 
-		if !verifyHash(unikernel, conf.Unikernel[1]) {
-			panic("invalid unikernel hash")
-		}
-
-		bootELFUnikernel(unikernel)
-	default:
-		panic("invalid config")
+		boot(mem+kernelOffset, mem+paramsOffset)
 	}
 }
