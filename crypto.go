@@ -12,23 +12,34 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 )
 
-func verifySignature(bin []byte, sig []byte, pubKey string) (valid bool, err error) {
+func verifySignature(bin []byte, sig []byte, pubKey string) (err error) {
 	s, err := DecodeSignature(string(sig))
 
 	if err != nil {
-		return false, fmt.Errorf("invalid signature, %v", err)
+		return fmt.Errorf("invalid signature, %v", err)
 	}
 
 	pub, err := NewPublicKey(pubKey)
 
 	if err != nil {
-		return false, fmt.Errorf("invalid public key, %v", err)
+		return fmt.Errorf("invalid public key, %v", err)
 	}
 
-	return pub.Verify(bin, s)
+	valid, err := pub.Verify(bin, s)
+
+	if err != nil {
+		return fmt.Errorf("invalid signature, %v", err)
+	}
+
+	if !valid {
+		return errors.New("invalid signature")
+	}
+
+	return
 }
 
 func verifyHash(bin []byte, s string) bool {

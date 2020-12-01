@@ -54,11 +54,11 @@ func (c *Config) Init(p *Partition, configPath string) (err error) {
 	return
 }
 
-func (c *Config) Verify(sigPath string, pubKey string) (valid bool, err error) {
+func (c *Config) Verify(sigPath string, pubKey string) (err error) {
 	sig, err := c.partition.ReadAll(sigPath)
 
 	if err != nil {
-		return false, fmt.Errorf("invalid signature path, %v", err)
+		return fmt.Errorf("invalid signature path, %v", err)
 	}
 
 	return verifySignature(c.conf, sig, pubKey)

@@ -70,14 +70,10 @@ func main() {
 	}
 
 	if len(PublicKeyStr) > 0 {
-		valid, err := conf.Verify(defaultConfigPath+signatureSuffix, PublicKeyStr)
+		err := conf.Verify(defaultConfigPath+signatureSuffix, PublicKeyStr)
 
 		if err != nil {
 			panic(fmt.Sprintf("configuration error, %v\n", err))
-		}
-
-		if !valid {
-			panic("configuration error, invalid signature")
 		}
 	} else {
 		log.Printf("armory-boot: no public key, skipping signature verification")
