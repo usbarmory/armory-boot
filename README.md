@@ -84,9 +84,6 @@ Example `/boot/armory-boot.conf` configuration file for loading a Linux kernel:
 TamaGo unikernel boot
 ---------------------
 
-> :warning: this is currently experimental, and requires that the HW RNG is
-> not reinitialised.
-
 To load a TamaGo unikernel, the bootloader only needs the path to the ELF
 binary along with its SHA256 hash for validation.
 
