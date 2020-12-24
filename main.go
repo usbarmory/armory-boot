@@ -85,6 +85,8 @@ func main() {
 		panic(fmt.Sprintf("configuration error, %v\n", err))
 	}
 
+	dma.Init(dmaStart, dmaSize)
+
 	if !verifyHash(conf.kernel, conf.kernelHash) {
 		panic("invaid kernel hash")
 	}
@@ -103,7 +105,6 @@ func main() {
 
 	usbarmory.LED("white", true)
 
-	dma.Init(dmaStart, dmaSize)
 	mem, _ := dma.Reserve(dmaSize, 0)
 
 	if conf.elf {

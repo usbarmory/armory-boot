@@ -10,11 +10,16 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+
+	"github.com/f-secure-foundry/tamago/soc/imx6/dcp"
 )
+
+func init() {
+	dcp.Init()
+}
 
 func verifySignature(bin []byte, sig []byte, pubKey string) (err error) {
 	s, err := DecodeSignature(string(sig))
@@ -42,9 +47,12 @@ func verifySignature(bin []byte, sig []byte, pubKey string) (err error) {
 	return
 }
 
-func verifyHash(bin []byte, s string) bool {
-	h := sha256.New()
-	h.Write(bin)
+func verifyHash(bin []byte, s string) (valid bool) {
+	sum, err := dcp.Sum256(bin)
+
+	if err != nil {
+		return false
+	}
 
 	hash, err := hex.DecodeString(s)
 
@@ -52,5 +60,5 @@ func verifyHash(bin []byte, s string) bool {
 		return false
 	}
 
-	return bytes.Equal(h.Sum(nil), hash)
+	return bytes.Equal(sum[:], hash)
 }
