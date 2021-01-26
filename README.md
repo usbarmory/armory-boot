@@ -157,6 +157,25 @@ are used, in sequence, as follows:
 | 2. kernel verification complete | on   | on    |
 | 3. jumping to kernel image      | off  | off   |
 
+Serial Download Protocol
+========================
+
+This repository also provides a command line utility to load imx executables
+through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp).
+
+It can be used to load imx images, for testing or initial provisioning
+purposes, on devices in [USB SDP mode](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)):
+
+```
+make armory-boot-usb && sudo ./armory-boot-usb -i armory-boot.imx
+found device 15a2:0080 Freescale SemiConductor Inc  SE Blank 6ULL
+parsing armory-boot.imx
+loading DCD at 0x00910000 (952 bytes)
+loading imx to 0x9000f400 (2182144 bytes)
+jumping to 0x9000f400
+serial download complete
+```
+
 Authors
 =======
 

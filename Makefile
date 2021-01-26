@@ -37,6 +37,9 @@ imx_signed: $(APP)-signed.imx
 
 elf: $(APP)
 
+$(APP)-usb:
+	go build cmd/$(APP)-usb.go
+
 #### utilities ####
 
 check_env:
@@ -72,7 +75,7 @@ dcd:
 
 clean:
 	rm -f $(APP)
-	@rm -fr $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd
+	@rm -fr $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd $(APP)-usb
 
 #### dependencies ####
 
