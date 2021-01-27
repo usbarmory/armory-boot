@@ -39,9 +39,9 @@ elf: $(APP)
 
 $(APP)-usb:
 	@if [ "${TAMAGO}" != "" ]; then \
-		${TAMAGO} build cmd/$(APP)-usb.go; \
+		${TAMAGO} build cmd/$(APP)-usb/*.go; \
 	else \
-		go build cmd/$(APP)-usb.go; \
+		go build cmd/$(APP)-usb/*.go; \
 	fi
 
 #### utilities ####
