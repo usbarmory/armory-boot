@@ -38,7 +38,11 @@ imx_signed: $(APP)-signed.imx
 elf: $(APP)
 
 $(APP)-usb:
-	go build cmd/$(APP)-usb.go
+	@if [ "${TAMAGO}" != "" ]; then \
+		${TAMAGO} build cmd/$(APP)-usb.go; \
+	else \
+		go build cmd/$(APP)-usb.go; \
+	fi
 
 #### utilities ####
 
@@ -74,8 +78,7 @@ dcd:
 	cp -f $(GOMODCACHE)/$(TAMAGO_PKG)/board/f-secure/usbarmory/mark-two/imximage.cfg $(APP).dcd
 
 clean:
-	rm -f $(APP)
-	@rm -fr $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd $(APP)-usb
+	@rm -fr $(APP) $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd $(APP)-usb
 
 #### dependencies ####
 

@@ -28,12 +28,17 @@ import (
 	"github.com/flynn/hid"
 )
 
-const FreescaleVendorID = 0x15a2
+const (
+	// USB vendor ID for all supported devices
+	FreescaleVendorID = 0x15a2
 
-// This tool should work with all SDP capable SoCs from the i.MX series,
-// however only tested devices are included as supported devices.
-//
-// Pull Requests are welcome to expand this set.
+	// On-Chip RAM (OCRAM/iRAM) address for payload staging
+	iramOffset = 0x00910000
+)
+
+// This tool should work with all SoCs from the i.MX series capable of USB HID
+// based SDP, only tested devices are listed as supported, Pull Requests are
+// welcome to expand this set.
 var supportedDevices = map[uint16]string{
 	0x007d: "Freescale SemiConductor Inc  SE Blank 6UL",
 	0x0080: "Freescale SemiConductor Inc  SE Blank 6ULL",
@@ -86,7 +91,7 @@ func detect() (err error) {
 	}
 
 	if conf.dev == nil {
-		return errors.New("no device found (forgot sudo?)")
+		return errors.New("no device found, target missing or invalid permissions (forgot admin shell?)")
 	}
 
 	return
@@ -172,8 +177,9 @@ func main() {
 
 	flag.Parse()
 
-	if len(conf.input) < 0 {
+	if len(conf.input) <= 0 {
 		flag.PrintDefaults()
+		return
 	}
 
 	if err = detect(); err != nil {
@@ -199,8 +205,8 @@ func main() {
 		log.Fatal("DCD parsing error: %v", err)
 	}
 
-	log.Printf("loading DCD at %#08x (%d bytes)", 0x00910000, len(dcd))
-	err = dcdWrite(dcd, 0x00910000)
+	log.Printf("loading DCD at %#08x (%d bytes)", iramOffset, len(dcd))
+	err = dcdWrite(dcd, iramOffset)
 
 	if err != nil {
 		log.Fatal(err)

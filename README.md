@@ -6,6 +6,9 @@ acts as a primary boot loader for the [USB armory Mk II](https://github.com/f-se
 allowing boot of kernel images (e.g. Linux) from either the eMMC card or an
 external microSD card.
 
+This repository also provides a command line utility to load imx executables
+through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp).
+
 Compiling
 =========
 
@@ -157,17 +160,30 @@ are used, in sequence, as follows:
 | 2. kernel verification complete | on   | on    |
 | 3. jumping to kernel image      | off  | off   |
 
-Serial Download Protocol
-========================
+Serial Download Protocol utility
+================================
 
-This repository also provides a command line utility to load imx executables
-through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp).
+The `armory-boot-usb` command line utility allows to load an imx executable
+through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp),
+useful for testing or initial provisioning purposes.
 
-It can be used to load imx images, for testing or initial provisioning
-purposes, on devices in [USB SDP mode](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)):
+The utility can be compiled within the project repository:
 
 ```
-make armory-boot-usb && sudo ./armory-boot-usb -i armory-boot.imx
+make armory-boot-usb
+```
+
+Or installed in your $GOPATH:
+
+```
+go get github.com/f-secure-foundry/armory-boot/cmd/armory-boot-usb
+```
+
+It can then be used on devices running in
+[USB SDP mode](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)):
+
+```
+sudo ./armory-boot-usb -i armory-boot.imx
 found device 15a2:0080 Freescale SemiConductor Inc  SE Blank 6ULL
 parsing armory-boot.imx
 loading DCD at 0x00910000 (952 bytes)
