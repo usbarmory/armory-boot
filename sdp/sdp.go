@@ -18,7 +18,7 @@ import (
 const HIDReportSize = 1024
 
 // SDP command types
-// p322, 8.9.3 Serial Download Protocol (SDP), IMX6ULLRM).
+// (p322, 8.9.3 Serial Download Protocol (SDP), IMX6ULLRM).
 const (
 	WriteFile     = 0x0404
 	DCDWrite      = 0x0a0a
