@@ -25,6 +25,9 @@ The utility can be compiled installed in your $GOPATH as follows:
 go get github.com/f-secure-foundry/armory-boot/cmd/armory-boot-usb
 ```
 
+Alternatively pre-compiled binaries for Linux and Windows are released
+[here](https://github.com/f-secure-foundry/armory-boot/releases).
+
 It can then be used on devices running in
 [USB SDP mode](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)):
 
