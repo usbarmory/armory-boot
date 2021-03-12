@@ -167,26 +167,34 @@ The `armory-boot-usb` command line utility allows to load an imx executable
 through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp),
 useful for testing or initial provisioning purposes.
 
-The utility can be compiled within the project repository:
-
-```
-make armory-boot-usb
-```
-
-Or installed in your $GOPATH:
+You can automatically download, compile and install the utility, under your
+GOPATH, as follows:
 
 ```
 go get github.com/f-secure-foundry/armory-boot/cmd/armory-boot-usb
 ```
 
-Alternatively pre-compiled binaries for Linux and Windows are released
+Alternatively you can manually compile it from source:
+
+```
+git clone https://github.com/f-secure-foundry/armory-boot
+cd armory-boot && make armory-boot-usb
+```
+
+The utility can be cross compiled Windows as follows:
+
+```
+make armory-boot-usb.exe
+```
+
+Pre-compiled binaries for Linux and Windows are released
 [here](https://github.com/f-secure-foundry/armory-boot/releases).
 
-It can then be used on devices running in
+The utility is meant to be used on devices running in
 [USB SDP mode](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)):
 
 ```
-sudo ./armory-boot-usb -i armory-boot.imx
+sudo armory-boot-usb -i armory-boot.imx
 found device 15a2:0080 Freescale SemiConductor Inc  SE Blank 6ULL
 parsing armory-boot.imx
 loading DCD at 0x00910000 (952 bytes)

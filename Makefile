@@ -23,7 +23,8 @@ endif
 APP := armory-boot
 GOENV := GO_EXTLINK_ENABLED=0 CGO_ENABLED=0 GOOS=tamago GOARM=7 GOARCH=arm
 TEXT_START := 0x90010000 # ramStart (defined in imx6/imx6ul/memory.go) + 0x10000
-GOFLAGS := -tags ${BUILD_TAGS} -ldflags "-s -w -T $(TEXT_START) -E _rt0_arm_tamago -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
+TAMAGOFLAGS := -tags ${BUILD_TAGS} -trimpath -ldflags "-s -w -T $(TEXT_START) -E _rt0_arm_tamago -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
+GOFLAGS := -trimpath -ldflags "-s -w"
 
 .PHONY: clean
 
@@ -39,9 +40,17 @@ elf: $(APP)
 
 $(APP)-usb:
 	@if [ "${TAMAGO}" != "" ]; then \
-		${TAMAGO} build cmd/$(APP)-usb/*.go; \
+		${TAMAGO} build $(GOFLAGS) cmd/$(APP)-usb/*.go; \
 	else \
-		go build cmd/$(APP)-usb/*.go; \
+		go build $(GOFLAGS) cmd/$(APP)-usb/*.go; \
+	fi
+
+$(APP)-usb.exe: BUILD_OPTS := GOOS=windows CGO_ENABLED=1 CXX=x86_64-w64-mingw32-g++ CC=x86_64-w64-mingw32-gcc
+$(APP)-usb.exe:
+	@if [ "${TAMAGO}" != "" ]; then \
+		$(BUILD_OPTS) ${TAMAGO} build cmd/$(APP)-usb/*.go; \
+	else \
+		$(BUILD_OPTS) go build cmd/$(APP)-usb/*.go; \
 	fi
 
 #### utilities ####
@@ -78,12 +87,12 @@ dcd:
 	cp -f $(GOMODCACHE)/$(TAMAGO_PKG)/board/f-secure/usbarmory/mark-two/imximage.cfg $(APP).dcd
 
 clean:
-	@rm -fr $(APP) $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd $(APP)-usb
+	@rm -fr $(APP) $(APP).bin $(APP).imx $(APP)-signed.imx $(APP).csf $(APP).dcd $(APP)-usb $(APP)-usb.exe
 
 #### dependencies ####
 
 $(APP): check_tamago check_env
-	$(GOENV) $(TAMAGO) build $(GOFLAGS) -o ${APP}
+	$(GOENV) $(TAMAGO) build $(TAMAGOFLAGS) -o ${APP}
 
 $(APP).dcd: check_tamago
 $(APP).dcd: GOMODCACHE=$(shell ${TAMAGO} env GOMODCACHE)
