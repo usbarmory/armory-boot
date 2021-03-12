@@ -107,7 +107,7 @@ $(APP).imx: $(APP).bin $(APP).dcd
 #### secure boot ####
 
 $(APP)-signed.imx: check_hab_keys $(APP).imx
-	${TAMAGO} get github.com/f-secure-foundry/crucible/cmd/habtool
+	${TAMAGO} install github.com/f-secure-foundry/crucible/cmd/habtool@latest
 	$(shell ${TAMAGO} env GOPATH)/bin/habtool \
 		-A ${HAB_KEYS}/CSF_1_key.pem \
 		-a ${HAB_KEYS}/CSF_1_crt.pem \
