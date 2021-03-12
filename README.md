@@ -171,7 +171,7 @@ You can automatically download, compile and install the utility, under your
 GOPATH, as follows:
 
 ```
-go get github.com/f-secure-foundry/armory-boot/cmd/armory-boot-usb
+go install github.com/f-secure-foundry/armory-boot/cmd/armory-boot-usb
 ```
 
 Alternatively you can manually compile it from source:
