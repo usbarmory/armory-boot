@@ -67,6 +67,9 @@ func BuildFileWriteReport(imx []byte, addr uint32) (r1 []byte, r2 [][]byte) {
 		DataCount:   uint32(len(imx)),
 	}
 
+	// make a copy to leave input slice untouched
+	imx = append(imx[:0:0], imx...)
+
 	// DCD pointer must be cleared
 	binary.LittleEndian.PutUint32(imx[DCDOffset:], 0)
 
