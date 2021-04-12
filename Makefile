@@ -55,6 +55,9 @@ $(APP)-usb.exe:
 
 #### utilities ####
 
+update_deps:
+	GOARCH=arm GOOS=tamago ${TAMAGO} get -tags ${BUILD_TAGS} -u
+
 check_env:
 	@if [ "${BOOT}" != "eMMC" ] && [ "${BOOT}" != "uSD" ]; then \
 		echo 'You need to set the BOOT variable to either eMMC or uSD to select boot media'; \

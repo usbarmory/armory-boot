@@ -22,7 +22,7 @@ func exec(kernel uint32, params uint32)
 func svc()
 
 func boot(kernel uint32, params uint32) {
-	arm.ExceptionHandler(func(n int) {
+	arm.ExceptionHandler = func(n int) {
 		if n != arm.SUPERVISOR {
 			panic("unhandled exception")
 		}
@@ -35,12 +35,12 @@ func boot(kernel uint32, params uint32) {
 		// RNGB driver doesn't play well with previous initializations
 		rngb.Reset()
 
-		imx6.ARM.InterruptsDisable()
-		imx6.ARM.CacheFlushData()
-		imx6.ARM.CacheDisable()
+		imx6.ARM.DisableInterrupts()
+		imx6.ARM.FlushDataCache()
+		imx6.ARM.DisableCache()
 
 		exec(kernel, params)
-	})
+	}
 
 	svc()
 }
