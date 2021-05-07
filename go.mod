@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8
 	github.com/dsoprea/go-logging v0.0.0-20200710184922-b02d349568dd // indirect
-	github.com/f-secure-foundry/crucible v0.0.0-20210412160519-6e04f63398d9 // indirect
+	github.com/f-secure-foundry/crucible v0.0.0-20210503082702-01e44ec14e7a // indirect
 	github.com/f-secure-foundry/tamago v0.0.0-20210507073204-a2e021e0e2f6
 	github.com/flynn/hid v0.0.0-20190502022136-f1b9b6cc019a
 	github.com/go-errors/errors v1.2.0 // indirect
