@@ -22,7 +22,7 @@ func exec(kernel uint32, params uint32)
 func svc()
 
 func boot(kernel uint32, params uint32) {
-	arm.ExceptionHandler = func(n int) {
+	arm.SystemExceptionHandler = func(n int) {
 		if n != arm.SUPERVISOR {
 			panic("unhandled exception")
 		}

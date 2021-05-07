@@ -80,7 +80,7 @@ Example `/boot/armory-boot.conf` configuration file for loading a Linux kernel:
     "/boot/imx6ulz-usbarmory-default-5.4.51-0.dtb",
     "60d4fe465ef60042293f5723bf4a001d8e75f26e517af2b55e6efaef9c0db1f6"
   ],
-  "cmdline": "console=ttymxc1,115200 root=/dev/mmcblk1p1 rootwait rw"
+  "cmdline": "console=ttymxc1,115200 root=/dev/mmcblk0p1 rootwait rw"
 }
 ```
 

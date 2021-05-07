@@ -88,7 +88,7 @@ func main() {
 	dma.Init(dmaStart, dmaSize)
 
 	if !verifyHash(conf.kernel, conf.kernelHash) {
-		panic("invaid kernel hash")
+		panic("invalid kernel hash")
 	}
 
 	if len(conf.params) > 0 {
