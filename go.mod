@@ -14,5 +14,3 @@ require (
 	golang.org/x/net v0.0.0-20210505214959-0714010a04ed // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 )
-
-replace github.com/f-secure-foundry/tamago => /mnt/git/public/tamago
