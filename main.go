@@ -9,13 +9,19 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
 
+	"github.com/f-secure-foundry/armory-boot/config"
+	"github.com/f-secure-foundry/armory-boot/disk"
+	"github.com/f-secure-foundry/armory-boot/exec"
+
 	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 	"github.com/f-secure-foundry/tamago/dma"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
+	"github.com/f-secure-foundry/tamago/soc/imx6/rngb"
 )
 
 var Build string
@@ -24,95 +30,104 @@ var Revision string
 var Boot string
 var Start string
 
+// signify/minisign authentication when defined
 var PublicKeyStr string
 
-var partition *Partition
-
 func init() {
-	usbarmory.LED("blue", false)
-	usbarmory.LED("white", false)
-
 	log.SetFlags(0)
 
 	if err := imx6.SetARMFreq(900); err != nil {
 		panic(fmt.Sprintf("cannot change ARM frequency, %v\n", err))
 	}
 
-	offset, err := strconv.ParseInt(Start, 10, 64)
+	dma.Init(dmaStart, dmaSize)
+}
+
+func initBootMedia(device string, start string) (part *disk.Partition, err error) {
+	offset, err := strconv.ParseInt(start, 10, 64)
 
 	if err != nil {
-		panic(fmt.Sprintf("invalid start offset, %v\n", err))
+		return nil, fmt.Errorf("invalid start offset, %v\n", err)
 	}
 
-	partition = &Partition{
+	part = &disk.Partition{
 		Offset: offset,
 	}
 
-	switch Boot {
+	switch device {
 	case "eMMC":
-		partition.Card = usbarmory.MMC
+		part.Card = usbarmory.MMC
 	case "uSD":
-		partition.Card = usbarmory.SD
+		part.Card = usbarmory.SD
 	default:
-		panic("invalid boot parameter")
+		return nil, errors.New("invalid boot parameter")
 	}
+
+	if err := part.Card.Detect(); err != nil {
+		return nil, fmt.Errorf("boot media error, %v\n", err)
+	}
+
+	return
+}
+
+func preLaunch() {
+	usbarmory.LED("blue", false)
+	usbarmory.LED("white", false)
+
+	// RNGB driver doesn't play well with previous initializations
+	rngb.Reset()
+
+	imx6.ARM.DisableInterrupts()
+	imx6.ARM.FlushDataCache()
+	imx6.ARM.DisableCache()
 }
 
 func main() {
-	if err := partition.Card.Detect(); err != nil {
+	usbarmory.LED("blue", false)
+	usbarmory.LED("white", false)
+
+	part, err := initBootMedia(Boot, Start)
+
+	if err != nil {
 		panic(fmt.Sprintf("boot media error, %v\n", err))
 	}
 
 	usbarmory.LED("blue", true)
 
-	if err := conf.Init(partition, defaultConfigPath); err != nil {
-		panic(fmt.Sprintf("configuration error, %v\n", err))
-	}
-
-	if len(PublicKeyStr) > 0 {
-		err := conf.Verify(defaultConfigPath+signatureSuffix, PublicKeyStr)
-
-		if err != nil {
-			panic(fmt.Sprintf("configuration error, %v\n", err))
-		}
-	} else {
+	if len(PublicKeyStr) == 0 {
 		log.Printf("armory-boot: no public key, skipping signature verification")
 	}
 
-	err := conf.Load()
+	conf, err := config.Load(part, config.DefaultConfigPath, config.DefaultSignaturePath, PublicKeyStr)
 
 	if err != nil {
 		panic(fmt.Sprintf("configuration error, %v\n", err))
 	}
 
-	dma.Init(dmaStart, dmaSize)
-
-	if !verifyHash(conf.kernel, conf.kernelHash) {
-		panic("invalid kernel hash")
-	}
-
-	if len(conf.params) > 0 {
-		if !verifyHash(conf.params, conf.paramsHash) {
-			panic("invalid dtb hash")
-		}
-
-		conf.params, err = fixupDeviceTree(conf.params, conf.CmdLine)
-
-		if err != nil {
-			panic(fmt.Sprintf("dtb fixup error, %v\n", err))
-		}
-	}
+	conf.Print()
 
 	usbarmory.LED("white", true)
 
-	mem, _ := dma.Reserve(dmaSize, 0)
+	// We can now reserve the entire DMA for kernel loading as we no longer
+	// need any driver.
+	mem := dma.Default()
+	mem.Reserve(dmaSize, 0)
 
-	if conf.elf {
-		boot(loadELF(mem, conf.kernel), 0)
+	if conf.ELF {
+		err = exec.BootELF(mem, conf.Kernel(), preLaunch)
 	} else {
-		dma.Write(mem, conf.kernel, kernelOffset)
-		dma.Write(mem, conf.params, paramsOffset)
+		err = exec.BootLinux(mem, &exec.LinuxImage{
+			Kernel:               conf.Kernel(),
+			DeviceTreeBlob:       conf.DeviceTreeBlob(),
+			InitialRamDisk:       conf.InitialRamDisk(),
+			KernelOffset:         kernelOffset,
+			DeviceTreeBlobOffset: paramsOffset,
+			InitialRamDiskOffset: initrdOffset,
+			CmdLine:              conf.CmdLine,
+		}, preLaunch)
+	}
 
-		boot(mem+kernelOffset, mem+paramsOffset)
+	if err != nil {
+		panic(fmt.Sprintf("boot error, %v\n", err))
 	}
 }

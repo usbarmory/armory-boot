@@ -69,6 +69,8 @@ To load a Linux kernel, the bootloader requires that you provide the paths to
 the kernel image and the Device Tree Blob file, along with their respective
 SHA256 hashes for validation, as well as the kernel command line.
 
+An optional initial ramdisk can be passed with the `initrd` parameter.
+
 Example `/boot/armory-boot.conf` configuration file for loading a Linux kernel:
 
 ```
@@ -80,6 +82,10 @@ Example `/boot/armory-boot.conf` configuration file for loading a Linux kernel:
   "dtb": [
     "/boot/imx6ulz-usbarmory-default-5.4.51-0.dtb",
     "60d4fe465ef60042293f5723bf4a001d8e75f26e517af2b55e6efaef9c0db1f6"
+  ],
+  "initrd": [
+    "/boot/initrd.img-5.4.51-0-usbarmory",
+    "64119096fd329e89f062cb5e0fc5b8e66f98081aef987e0bc7a92a05f4452540"
   ],
   "cmdline": "console=ttymxc1,115200 root=/dev/mmcblk0p1 rootwait rw"
 }

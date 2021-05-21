@@ -21,8 +21,13 @@ var ramStart uint32 = 0x90000000
 //go:linkname ramSize runtime.ramSize
 var ramSize uint32 = 0x10000000
 
-var dmaStart uint32 = 0x80000000
-var dmaSize = 0x10000000
+const (
+	dmaStart = 0x80000000
+	dmaSize  = 0x10000000
+)
 
-const kernelOffset = 0x0800000
-const paramsOffset = 0x7000000
+const (
+	kernelOffset = 0x0800000
+	paramsOffset = 0x7000000
+	initrdOffset = 0x8000000
+)

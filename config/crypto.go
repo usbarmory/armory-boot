@@ -6,7 +6,7 @@
 // Use of this source code is governed by the license
 // that can be found in the LICENSE file.
 
-package main
+package config
 
 import (
 	"bytes"
@@ -21,7 +21,10 @@ func init() {
 	dcp.Init()
 }
 
-func verifySignature(bin []byte, sig []byte, pubKey string) (err error) {
+// Verify authenticates an input against a signify/minisign generated
+// signature, pubKey must be the last line of a signify/minisign public key
+// (i.e. without comments).
+func Verify(buf []byte, sig []byte, pubKey string) (err error) {
 	s, err := DecodeSignature(string(sig))
 
 	if err != nil {
@@ -34,7 +37,7 @@ func verifySignature(bin []byte, sig []byte, pubKey string) (err error) {
 		return fmt.Errorf("invalid public key, %v", err)
 	}
 
-	valid, err := pub.Verify(bin, s)
+	valid, err := pub.Verify(buf, s)
 
 	if err != nil {
 		return fmt.Errorf("invalid signature, %v", err)
@@ -47,8 +50,14 @@ func verifySignature(bin []byte, sig []byte, pubKey string) (err error) {
 	return
 }
 
-func verifyHash(bin []byte, s string) (valid bool) {
-	sum, err := dcp.Sum256(bin)
+// CompareHash computes a SHA256 checksum of the input data, using hardware
+// acceleration (NXP DCP), and compares the computed hash with the one passed
+// as a string with only hexadecimal characters and even length.
+//
+// This function is only meant to be used with `GOOS=tamago GOARCH=arm` on
+// i.MX6 targets.
+func CompareHash(buf []byte, s string) (valid bool) {
+	sum, err := dcp.Sum256(buf)
 
 	if err != nil {
 		return false

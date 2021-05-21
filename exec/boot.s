@@ -8,7 +8,7 @@
 
 // func svc()
 TEXT ·svc(SB),$0
-	WORD	$0xef000001	// svc 0x00000001
+	SWI	$0
 
 // func exec(kernel uint32, params uint32)
 TEXT ·exec(SB),$0-8
@@ -17,13 +17,13 @@ TEXT ·exec(SB),$0-8
 
 	// Disable MMU
 	MRC	15, 0, R0, C1, C0, 0
-	BIC	$0x1, R0
+	BIC	$1, R0
 	MCR	15, 0, R0, C1, C0, 0
 
 	// CPU register 0 must be 0
 	MOVW	$0, R0
 	// CPU register 1 must be the ARM Linux machine type
-	MOVW	$0xffffffff, R1
+	MOVW	$(1 << 32), R1
 	// CPU register 2 must be the parameter list address
 	MOVW	R4, R2
 
