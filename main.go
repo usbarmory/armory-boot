@@ -19,7 +19,6 @@ import (
 	"github.com/f-secure-foundry/armory-boot/exec"
 
 	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
-	"github.com/f-secure-foundry/tamago/dma"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
 	"github.com/f-secure-foundry/tamago/soc/imx6/rngb"
 )
@@ -39,8 +38,6 @@ func init() {
 	if err := imx6.SetARMFreq(900); err != nil {
 		panic(fmt.Sprintf("cannot change ARM frequency, %v\n", err))
 	}
-
-	dma.Init(dmaStart, dmaSize)
 }
 
 func initBootMedia(device string, start string) (part *disk.Partition, err error) {
@@ -76,10 +73,6 @@ func preLaunch() {
 
 	// RNGB driver doesn't play well with previous initializations
 	rngb.Reset()
-
-	imx6.ARM.DisableInterrupts()
-	imx6.ARM.FlushDataCache()
-	imx6.ARM.DisableCache()
 }
 
 func main() {
@@ -104,14 +97,9 @@ func main() {
 		panic(fmt.Sprintf("configuration error, %v\n", err))
 	}
 
-	conf.Print()
+	log.Printf("\n%s", conf.JSON)
 
 	usbarmory.LED("white", true)
-
-	// We can now reserve the entire DMA for kernel loading as we no longer
-	// need any driver.
-	mem := dma.Default()
-	mem.Reserve(dmaSize, 0)
 
 	if conf.ELF {
 		err = exec.BootELF(mem, conf.Kernel(), preLaunch)

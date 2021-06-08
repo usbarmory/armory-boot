@@ -19,6 +19,7 @@ import (
 	"log"
 
 	"github.com/f-secure-foundry/tamago/arm"
+	"github.com/f-secure-foundry/tamago/soc/imx6"
 )
 
 // defined in boot.s
@@ -32,6 +33,10 @@ func boot(kernel uint32, params uint32, cleanup func()) (err error) {
 		}
 
 		cleanup()
+
+		imx6.ARM.DisableInterrupts()
+		imx6.ARM.FlushDataCache()
+		imx6.ARM.DisableCache()
 
 		log.Printf("armory-boot: starting kernel@%x params@%x\n", kernel, params)
 		exec(kernel, params)

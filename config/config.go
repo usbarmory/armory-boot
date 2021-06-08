@@ -20,7 +20,7 @@ import (
 )
 
 // DefaultConfigPath is the default armory-boot configuration file path.
-const DefaultConfigPath = "/boot/armory-boot-test.conf"
+const DefaultConfigPath = "/boot/armory-boot.conf"
 
 // DefaultSignaturePath is the default armory-boot configuration file signature
 // path.
@@ -46,8 +46,8 @@ type Config struct {
 	// ELF indicates whether the loaded kernel is a unikernel or not.
 	ELF bool
 
-	part *disk.Partition
-	json []byte
+	// JSON holds the configuration file contents
+	JSON []byte
 
 	kernel []byte
 	dtb    []byte
@@ -58,10 +58,10 @@ type Config struct {
 	initrdHash string
 }
 
-func (c *Config) init() (err error) {
+func (c *Config) init(part *disk.Partition) (err error) {
 	var kernelPath string
 
-	if err = json.Unmarshal(c.json, &c); err != nil {
+	if err = json.Unmarshal(c.JSON, &c); err != nil {
 		return
 	}
 
@@ -87,7 +87,7 @@ func (c *Config) init() (err error) {
 				return errors.New("invalid initrd parameter size")
 			}
 
-			if c.initrd, err = c.part.ReadAll(c.InitialRamDiskPath[0]); err != nil {
+			if c.initrd, err = part.ReadAll(c.InitialRamDiskPath[0]); err != nil {
 				return
 			}
 
@@ -97,7 +97,7 @@ func (c *Config) init() (err error) {
 		kernelPath = c.KernelPath[0]
 		c.kernelHash = c.KernelPath[1]
 
-		if c.dtb, err = c.part.ReadAll(c.DeviceTreeBlobPath[0]); err != nil {
+		if c.dtb, err = part.ReadAll(c.DeviceTreeBlobPath[0]); err != nil {
 			return
 		}
 
@@ -111,16 +111,16 @@ func (c *Config) init() (err error) {
 		c.kernelHash = c.UnikernelPath[1]
 	}
 
-	if c.kernel, err = c.part.ReadAll(kernelPath); err != nil {
+	if c.kernel, err = part.ReadAll(kernelPath); err != nil {
 		return fmt.Errorf("invalid path %s, %v", kernelPath, err)
-	}
-
-	if isUnikernel {
-		c.ELF = true
 	}
 
 	if err != nil {
 		return fmt.Errorf("invalid path %s, %v", c.DeviceTreeBlobPath[0], err)
+	}
+
+	if isUnikernel {
+		c.ELF = true
 	}
 
 	return
@@ -132,11 +132,9 @@ func (c *Config) init() (err error) {
 func Load(part *disk.Partition, configPath string, sigPath string, pubKey string) (c *Config, err error) {
 	log.Printf("armory-boot: loading configuration at %s\n", configPath)
 
-	c = &Config{
-		part: part,
-	}
+	c = &Config{}
 
-	if c.json, err = part.ReadAll(configPath); err != nil {
+	if c.JSON, err = part.ReadAll(configPath); err != nil {
 		return
 	}
 
@@ -147,7 +145,7 @@ func Load(part *disk.Partition, configPath string, sigPath string, pubKey string
 			return nil, fmt.Errorf("invalid signature path, %v", err)
 		}
 
-		if err = Verify(c.json, sig, pubKey); err != nil {
+		if err = Verify(c.JSON, sig, pubKey); err != nil {
 			return nil, err
 		}
 	}
@@ -160,7 +158,7 @@ func Load(part *disk.Partition, configPath string, sigPath string, pubKey string
 		}
 	}()
 
-	if err = c.init(); err != nil {
+	if err = c.init(part); err != nil {
 		return
 	}
 
@@ -198,10 +196,4 @@ func (c *Config) DeviceTreeBlob() []byte {
 // a successful Load().
 func (c *Config) InitialRamDisk() []byte {
 	return c.initrd
-}
-
-// Print logs the configuration parameters.
-func (c *Config) Print() {
-	j, _ := json.MarshalIndent(c, "", "\t")
-	log.Printf("\n%s", string(j))
 }
