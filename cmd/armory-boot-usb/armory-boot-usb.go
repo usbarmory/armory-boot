@@ -25,7 +25,7 @@ import (
 
 	"github.com/f-secure-foundry/armory-boot/sdp"
 
-	"github.com/flynn/hid"
+	"github.com/f-secure-foundry/hid"
 )
 
 const (
