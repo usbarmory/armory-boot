@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/f-secure-foundry/armory-boot/sdp"
@@ -121,8 +122,6 @@ func sendHIDReport(n int, buf []byte, wait int) (res []byte, err error) {
 			return nil, errors.New("command timeout")
 		}
 	}
-
-	return
 }
 
 func dcdWrite(dcd []byte, addr uint32) (err error) {
@@ -149,13 +148,37 @@ func fileWrite(imx []byte, addr uint32) (err error) {
 	}
 
 	wait := -1
+	timer := time.After(time.Duration(conf.timeout) * time.Second)
 
 	for i, r := range r2 {
 		if i == len(r2)-1 {
 			wait = 4
 		}
-
+	send:
 		_, err = sendHIDReport(2, r, wait)
+
+		if err != nil && runtime.GOOS == "darwin" && err.Error() == "hid: general error" {
+			// On macOS access contention with the OS causes
+			// errors, as a workaround we retry from the transfer
+			// that got caught up.
+			select {
+			case <-timer:
+				return
+			default:
+				off := uint32(i) * 1024
+				r1 := &sdp.SDP{
+					CommandType: sdp.WriteFile,
+					Address:     addr + off,
+					DataCount:   uint32(len(imx)) - off,
+				}
+
+				if _, err = sendHIDReport(1, r1.Bytes(), -1); err != nil {
+					return
+				}
+
+				goto send
+			}
+		}
 
 		if err != nil {
 			break
