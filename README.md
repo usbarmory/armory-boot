@@ -188,7 +188,7 @@ git clone https://github.com/f-secure-foundry/armory-boot
 cd armory-boot && make armory-boot-usb
 ```
 
-The utility can be cross compiled Windows as follows:
+The utility can be cross compiled for Windows as follows:
 
 ```
 make armory-boot-usb.exe
