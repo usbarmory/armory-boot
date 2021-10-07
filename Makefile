@@ -1,5 +1,3 @@
-# http://github.com/f-secure-foundry/tamago-example
-#
 # Copyright (c) F-Secure Corporation
 # https://foundry.f-secure.com
 #
