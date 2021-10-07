@@ -6,8 +6,8 @@ acts as a primary boot loader for the [USB armory Mk II](https://github.com/f-se
 allowing boot of kernel images (e.g. Linux) from either the eMMC card or an
 external microSD card.
 
-This repository also provides a command line utility to load imx executables
-through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp).
+This repository also provides a [command line utility](https://github.com/f-secure-foundry/armory-boot#serial-download-protocol-utility)
+to load imx executables through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp).
 
 Compiling
 =========
