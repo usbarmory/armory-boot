@@ -61,7 +61,7 @@ func initBootMedia(device string, start string) (part *disk.Partition, err error
 	}
 
 	if err := part.Card.Detect(); err != nil {
-		return nil, fmt.Errorf("boot media error, %v\n", err)
+		return nil, fmt.Errorf("could not detect %s, %v\n", device, err)
 	}
 
 	return
