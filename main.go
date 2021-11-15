@@ -9,10 +9,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/f-secure-foundry/armory-boot/config"
 	"github.com/f-secure-foundry/armory-boot/disk"
@@ -40,33 +38,6 @@ func init() {
 	}
 }
 
-func initBootMedia(device string, start string) (part *disk.Partition, err error) {
-	offset, err := strconv.ParseInt(start, 10, 64)
-
-	if err != nil {
-		return nil, fmt.Errorf("invalid start offset, %v\n", err)
-	}
-
-	part = &disk.Partition{
-		Offset: offset,
-	}
-
-	switch device {
-	case "eMMC":
-		part.Card = usbarmory.MMC
-	case "uSD":
-		part.Card = usbarmory.SD
-	default:
-		return nil, errors.New("invalid boot parameter")
-	}
-
-	if err := part.Card.Detect(); err != nil {
-		return nil, fmt.Errorf("could not detect %s, %v\n", device, err)
-	}
-
-	return
-}
-
 func preLaunch() {
 	usbarmory.LED("blue", false)
 	usbarmory.LED("white", false)
@@ -79,7 +50,7 @@ func main() {
 	usbarmory.LED("blue", false)
 	usbarmory.LED("white", false)
 
-	part, err := initBootMedia(Boot, Start)
+	part, err := disk.Detect(Boot, Start)
 
 	if err != nil {
 		panic(fmt.Sprintf("boot media error, %v\n", err))
