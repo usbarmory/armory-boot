@@ -106,7 +106,7 @@ func main() {
 	if conf.ELF {
 		image = &exec.ELFImage{
 			Region: mem,
-			Kernel: conf.Kernel(),
+			ELF:    conf.Kernel(),
 		}
 	} else {
 		image = &exec.LinuxImage{

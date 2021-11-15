@@ -21,8 +21,8 @@ import (
 type ELFImage struct {
 	// Region is the memory area for image loading.
 	Region *dma.Region
-	// Kernel is the bootable bare-metal ELF image.
-	Kernel []byte
+	// ELF is a bootable bare-metal ELF image.
+	ELF []byte
 
 	entry  uint32
 	loaded bool
@@ -37,7 +37,7 @@ func (image *ELFImage) Load() (err error) {
 		return errors.New("image memory Region must be assigned")
 	}
 
-	f, err := elf.NewFile(bytes.NewReader(image.Kernel))
+	f, err := elf.NewFile(bytes.NewReader(image.ELF))
 
 	if err != nil {
 		return
