@@ -152,14 +152,18 @@ func (image *LinuxImage) Load() (err error) {
 	return
 }
 
+// Entry returns the image entry point.
+func (image *LinuxImage) Entry() uint32 {
+	return image.Region.Start + uint32(image.KernelOffset)
+}
+
 // Boot calls a loaded Linux kernel image.
 func (image *LinuxImage) Boot(cleanup func()) (err error) {
 	if !image.loaded {
 		return errors.New("Load() kernel before Boot()")
 	}
 
-	kernelStart := image.Region.Start + uint32(image.KernelOffset)
 	dtbStart := image.Region.Start + uint32(image.DeviceTreeBlobOffset)
 
-	return boot(kernelStart, dtbStart, cleanup)
+	return boot(image.Entry(), dtbStart, cleanup)
 }

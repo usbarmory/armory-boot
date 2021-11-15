@@ -73,6 +73,11 @@ func (image *ELFImage) Load() (err error) {
 	return
 }
 
+// Entry returns the image entry point.
+func (image *ELFImage) Entry() uint32 {
+	return image.entry
+}
+
 // Boot calls a loaded bare-metal ELF image.
 func (image *ELFImage) Boot(cleanup func()) (err error) {
 	if !image.loaded {
