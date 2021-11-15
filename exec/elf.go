@@ -73,7 +73,7 @@ func (image *ELFImage) Load() (err error) {
 	return
 }
 
-// BootELF calls a loaded bare-metal ELF image.
+// Boot calls a loaded bare-metal ELF image.
 func (image *ELFImage) Boot(cleanup func()) (err error) {
 	if !image.loaded {
 		return errors.New("Load() kernel before Boot()")
