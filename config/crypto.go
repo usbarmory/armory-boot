@@ -14,11 +14,14 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/f-secure-foundry/tamago/soc/imx6"
 	"github.com/f-secure-foundry/tamago/soc/imx6/dcp"
 )
 
 func init() {
-	dcp.Init()
+	if imx6.Native {
+		dcp.Init()
+	}
 }
 
 // Verify authenticates an input against a signify/minisign generated
