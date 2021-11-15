@@ -21,6 +21,9 @@ import (
 
 // LinuxImage represents a bootable Linux kernel image.
 type LinuxImage struct {
+	// Region is the memory area for image loading.
+	Region *dma.Region
+
 	// Kernel is the Linux kernel image.
 	Kernel []byte
 	// KernelOffset is the Linux kernel offset from RAM start address.
@@ -38,6 +41,8 @@ type LinuxImage struct {
 
 	// CmdLine is the Linux kernel command line arguments.
 	CmdLine string
+
+	loaded bool
 }
 
 func (image *LinuxImage) fdt() (fdt *dt.FDT, err error) {
@@ -91,12 +96,12 @@ func (image *LinuxImage) fixupInitrd(addr uint32) (err error) {
 	for _, node := range fdt.RootNode.Children {
 		if node.Name == "chosen" {
 			initrdStart := dt.Property{
-				Name: "linux,initrd-start",
+				Name:  "linux,initrd-start",
 				Value: make([]byte, 4),
 			}
 
 			initrdEnd := dt.Property{
-				Name: "linux,initrd-end",
+				Name:  "linux,initrd-end",
 				Value: make([]byte, 4),
 			}
 
@@ -111,8 +116,12 @@ func (image *LinuxImage) fixupInitrd(addr uint32) (err error) {
 	return image.updateDTB(fdt)
 }
 
-// BootLinux loads and boots a Linux kernel image.
-func BootLinux(mem *dma.Region, image *LinuxImage, cleanup func()) (err error) {
+// Load loads a Linux kernel image in memory.
+func (image *LinuxImage) Load() (err error) {
+	if image.Region == nil {
+		return errors.New("image memory Region must be assigned")
+	}
+
 	if len(image.CmdLine) > 0 {
 		if len(image.DeviceTreeBlob) == 0 {
 			return errors.New("cmdline requires dtb")
@@ -128,18 +137,29 @@ func BootLinux(mem *dma.Region, image *LinuxImage, cleanup func()) (err error) {
 			return errors.New("initrd requires dtb")
 		}
 
-		if err = image.fixupInitrd(mem.Start); err != nil {
+		if err = image.fixupInitrd(image.Region.Start); err != nil {
 			return fmt.Errorf("initrd dtb fixup error, %v", err)
 		}
 
-		mem.Write(mem.Start, image.InitialRamDiskOffset, image.InitialRamDisk)
+		image.Region.Write(image.Region.Start, image.InitialRamDiskOffset, image.InitialRamDisk)
 	}
 
-	mem.Write(mem.Start, image.KernelOffset, image.Kernel)
-	mem.Write(mem.Start, image.DeviceTreeBlobOffset, image.DeviceTreeBlob)
+	image.Region.Write(image.Region.Start, image.KernelOffset, image.Kernel)
+	image.Region.Write(image.Region.Start, image.DeviceTreeBlobOffset, image.DeviceTreeBlob)
 
-	kernelStart := mem.Start + uint32(image.KernelOffset)
-	dtbStart := mem.Start + uint32(image.DeviceTreeBlobOffset)
+	image.loaded = true
+
+	return
+}
+
+// Boot calls a loaded Linux kernel image.
+func (image *LinuxImage) Boot(cleanup func()) (err error) {
+	if !image.loaded {
+		return errors.New("Load() kernel before Boot()")
+	}
+
+	kernelStart := image.Region.Start + uint32(image.KernelOffset)
+	dtbStart := image.Region.Start + uint32(image.DeviceTreeBlobOffset)
 
 	return boot(kernelStart, dtbStart, cleanup)
 }

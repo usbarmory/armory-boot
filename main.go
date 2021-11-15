@@ -101,10 +101,14 @@ func main() {
 
 	usbarmory.LED("white", true)
 
+	var image exec.BootImage
+
 	if conf.ELF {
-		err = exec.BootELF(mem, conf.Kernel(), preLaunch)
+		image = &exec.ELFImage{
+			Kernel: conf.Kernel(),
+		}
 	} else {
-		err = exec.BootLinux(mem, &exec.LinuxImage{
+		image = &exec.LinuxImage{
 			Kernel:               conf.Kernel(),
 			DeviceTreeBlob:       conf.DeviceTreeBlob(),
 			InitialRamDisk:       conf.InitialRamDisk(),
@@ -112,10 +116,14 @@ func main() {
 			DeviceTreeBlobOffset: paramsOffset,
 			InitialRamDiskOffset: initrdOffset,
 			CmdLine:              conf.CmdLine,
-		}, preLaunch)
+		}
 	}
 
-	if err != nil {
-		panic(fmt.Sprintf("boot error, %v\n", err))
+	if err = image.Load(); err != nil {
+		panic(fmt.Sprintf("load error, %v\n", err))
+	}
+
+	if err = image.Boot(preLaunch); err != nil {
+		panic(fmt.Sprintf("load error, %v\n", err))
 	}
 }

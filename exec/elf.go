@@ -11,18 +11,36 @@ package exec
 import (
 	"bytes"
 	"debug/elf"
+	"errors"
 	"fmt"
 
 	"github.com/f-secure-foundry/tamago/dma"
 )
 
-// LoadELF implements a _very_ simple ELF loader which is suitable for loading
-// bare-metal ELF files like those produced by TamaGo.
-func LoadELF(mem *dma.Region, addr uint32, buf []byte) (entry uint32) {
-	f, err := elf.NewFile(bytes.NewReader(buf))
+// ELFImage represents a bootable bare-metal ELF image.
+type ELFImage struct {
+	// Region is the memory area for image loading.
+	Region *dma.Region
+	// Kernel is the bootable bare-metal ELF image.
+	Kernel []byte
+
+	entry  uint32
+	loaded bool
+}
+
+// Load loads a bare-metal ELF image in memory.
+//
+// The ELF loader is _very_ simple, suitable for loading unikernels like those
+// produced by TamaGo.
+func (image *ELFImage) Load() (err error) {
+	if image.Region == nil {
+		return errors.New("image memory Region must be assigned")
+	}
+
+	f, err := elf.NewFile(bytes.NewReader(image.Kernel))
 
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	for idx, prg := range f.Progs {
@@ -35,18 +53,24 @@ func LoadELF(mem *dma.Region, addr uint32, buf []byte) (entry uint32) {
 		_, err := prg.ReadAt(b[0:prg.Filesz], 0)
 
 		if err != nil {
-			panic(fmt.Sprintf("failed to read LOAD section at idx %d, %q", idx, err))
+			return fmt.Errorf("failed to read LOAD section at idx %d, %q", idx, err)
 		}
 
-		offset := uint32(prg.Paddr) - addr
-		mem.Write(addr, int(offset), b)
+		offset := uint32(prg.Paddr) - image.Region.Start
+		image.Region.Write(image.Region.Start, int(offset), b)
 	}
 
-	return uint32(f.Entry)
+	image.entry = uint32(f.Entry)
+	image.loaded = true
+
+	return
 }
 
-// BootELF loads and boots a unikernel image.
-func BootELF(mem *dma.Region, buf []byte, cleanup func()) (err error) {
-	entry := LoadELF(mem, mem.Start, buf)
-	return boot(entry, 0, cleanup)
+// BootELF calls a loaded bare-metal ELF image.
+func (image *ELFImage) Boot(cleanup func()) (err error) {
+	if !image.loaded {
+		return errors.New("Load() kernel before Boot()")
+	}
+
+	return boot(image.entry, 0, cleanup)
 }
