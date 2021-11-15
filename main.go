@@ -105,11 +105,12 @@ func main() {
 
 	if conf.ELF {
 		image = &exec.ELFImage{
-			Kernel: conf.Kernel(),
 			Region: mem,
+			Kernel: conf.Kernel(),
 		}
 	} else {
 		image = &exec.LinuxImage{
+			Region:               mem,
 			Kernel:               conf.Kernel(),
 			DeviceTreeBlob:       conf.DeviceTreeBlob(),
 			InitialRamDisk:       conf.InitialRamDisk(),
@@ -117,7 +118,6 @@ func main() {
 			DeviceTreeBlobOffset: paramsOffset,
 			InitialRamDiskOffset: initrdOffset,
 			CmdLine:              conf.CmdLine,
-			Region:               mem,
 		}
 	}
 

@@ -42,6 +42,8 @@ type LinuxImage struct {
 	// CmdLine is the Linux kernel command line arguments.
 	CmdLine string
 
+	entry  uint32
+	dtb    uint32
 	loaded bool
 }
 
@@ -147,6 +149,8 @@ func (image *LinuxImage) Load() (err error) {
 	image.Region.Write(image.Region.Start, image.KernelOffset, image.Kernel)
 	image.Region.Write(image.Region.Start, image.DeviceTreeBlobOffset, image.DeviceTreeBlob)
 
+	image.entry = image.Region.Start + uint32(image.KernelOffset)
+	image.dtb = image.Region.Start + uint32(image.DeviceTreeBlobOffset)
 	image.loaded = true
 
 	return
@@ -154,7 +158,7 @@ func (image *LinuxImage) Load() (err error) {
 
 // Entry returns the image entry point.
 func (image *LinuxImage) Entry() uint32 {
-	return image.Region.Start + uint32(image.KernelOffset)
+	return image.entry
 }
 
 // Boot calls a loaded Linux kernel image.
@@ -163,7 +167,5 @@ func (image *LinuxImage) Boot(cleanup func()) (err error) {
 		return errors.New("Load() kernel before Boot()")
 	}
 
-	dtbStart := image.Region.Start + uint32(image.DeviceTreeBlobOffset)
-
-	return boot(image.Entry(), dtbStart, cleanup)
+	return boot(image.entry, image.dtb, cleanup)
 }
