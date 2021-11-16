@@ -73,7 +73,7 @@ func (image *ELFImage) Load() (err error) {
 	return
 }
 
-// Entry returns the image entry point.
+// Entry returns the image entry address.
 func (image *ELFImage) Entry() uint32 {
 	return image.entry
 }

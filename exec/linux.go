@@ -156,9 +156,14 @@ func (image *LinuxImage) Load() (err error) {
 	return
 }
 
-// Entry returns the image entry point.
+// Entry returns the image entry address.
 func (image *LinuxImage) Entry() uint32 {
 	return image.entry
+}
+
+// DTB returns the image DTB address.
+func (image *LinuxImage) DTB() uint32 {
+	return image.dtb
 }
 
 // Boot calls a loaded Linux kernel image.
