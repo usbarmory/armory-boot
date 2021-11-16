@@ -22,8 +22,7 @@ TEXT ·exec(SB),$0-8
 
 	// CPU register 0 must be 0
 	MOVW	$0, R0
-	// CPU register 1 must be the ARM Linux machine type
-	MOVW	$(1 << 32), R1
+	// CPU register 1 not required for DTB boot
 	// CPU register 2 must be the parameter list address
 	MOVW	R4, R2
 
