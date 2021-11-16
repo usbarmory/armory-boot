@@ -67,7 +67,8 @@ Linux kernel boot
 
 To load a Linux kernel, the bootloader requires that you provide the paths to
 the kernel image and the Device Tree Blob file, along with their respective
-SHA256 hashes for validation, as well as the kernel command line.
+SHA256 hashes (only used with configuration signature verification, see _Secure
+Boot_), as well as the kernel command line.
 
 An optional initial ramdisk can be passed with the `initrd` parameter.
 
@@ -95,7 +96,8 @@ TamaGo unikernel boot
 ---------------------
 
 To load a TamaGo unikernel, the bootloader only needs the path to the ELF
-binary along with its SHA256 hash for validation.
+binary along with its SHA256 hash (only used with configuration signature
+verification, see _Secure Boot_).
 
 Example `/boot/armory-boot.conf` configuration file for loading a TamaGo
 unikernel:

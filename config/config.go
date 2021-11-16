@@ -162,6 +162,10 @@ func Load(part *disk.Partition, configPath string, sigPath string, pubKey string
 		return
 	}
 
+	if len(pubKey) == 0 {
+		return
+	}
+
 	if !CompareHash(c.kernel, c.kernelHash) {
 		err = errors.New("invalid kernel hash")
 		return
