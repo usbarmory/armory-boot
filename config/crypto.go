@@ -57,6 +57,11 @@ func Verify(buf []byte, sig []byte, pubKey string) (err error) {
 // acceleration (NXP DCP), and compares the computed hash with the one passed
 // as a string with only hexadecimal characters and even length.
 //
+// As this function is meant for pre-boot use, the entire input buffer is
+// copied in a DMA region for DCP consumption in a single pass, rather than
+// buffering over multiple passes, to reduce DCP command overhead. When used in
+// other contexts callers must ensure that enough DMA space is available.
+//
 // This function is only meant to be used with `GOOS=tamago GOARCH=arm` on
 // i.MX6 targets.
 func CompareHash(buf []byte, s string) (valid bool) {
