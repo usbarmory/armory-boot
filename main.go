@@ -18,7 +18,6 @@ import (
 
 	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
 	"github.com/f-secure-foundry/tamago/soc/imx6"
-	"github.com/f-secure-foundry/tamago/soc/imx6/rngb"
 )
 
 var Build string
@@ -41,9 +40,6 @@ func init() {
 func preLaunch() {
 	usbarmory.LED("blue", false)
 	usbarmory.LED("white", false)
-
-	// RNGB driver doesn't play well with previous initializations
-	rngb.Reset()
 }
 
 func main() {

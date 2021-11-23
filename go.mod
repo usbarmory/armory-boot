@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8
 	github.com/f-secure-foundry/hid v0.0.0-20210318233634-85ced88a1ffe
-	github.com/f-secure-foundry/tamago v0.0.0-20211105083740-8f4eb8811c15
+	github.com/f-secure-foundry/tamago v0.0.0-20211123102302-28cdf9744c3e
 	github.com/u-root/u-root v7.0.0+incompatible
 	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa
 )
