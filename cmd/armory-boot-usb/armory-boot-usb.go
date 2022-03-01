@@ -219,13 +219,13 @@ func main() {
 	ivt, err := sdp.ParseIVT(imx)
 
 	if err != nil {
-		log.Fatal("IVT parsing error: %v", err)
+		log.Fatalf("IVT parsing error: %v", err)
 	}
 
 	dcd, err := sdp.ParseDCD(imx, ivt)
 
 	if err != nil {
-		log.Fatal("DCD parsing error: %v", err)
+		log.Fatalf("DCD parsing error: %v", err)
 	}
 
 	log.Printf("loading DCD at %#08x (%d bytes)", iramOffset, len(dcd))
