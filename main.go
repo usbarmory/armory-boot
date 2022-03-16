@@ -1,4 +1,4 @@
-// https://github.com/f-secure-foundry/armory-boot
+// https://github.com/usbarmory/armory-boot
 //
 // Copyright (c) F-Secure Corporation
 // https://foundry.f-secure.com
@@ -12,12 +12,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/f-secure-foundry/armory-boot/config"
-	"github.com/f-secure-foundry/armory-boot/disk"
-	"github.com/f-secure-foundry/armory-boot/exec"
+	"github.com/usbarmory/armory-boot/config"
+	"github.com/usbarmory/armory-boot/disk"
+	"github.com/usbarmory/armory-boot/exec"
 
-	"github.com/f-secure-foundry/tamago/board/f-secure/usbarmory/mark-two"
-	"github.com/f-secure-foundry/tamago/soc/imx6"
+	"github.com/usbarmory/tamago/board/f-secure/usbarmory/mark-two"
+	"github.com/usbarmory/tamago/soc/imx6"
 )
 
 var Build string

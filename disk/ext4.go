@@ -1,4 +1,4 @@
-// https://github.com/f-secure-foundry/armory-boot
+// https://github.com/usbarmory/armory-boot
 //
 // Copyright (c) F-Secure Corporation
 // https://foundry.f-secure.com
@@ -11,7 +11,7 @@
 //
 // This package is only meant to be used with `GOOS=tamago GOARCH=arm` as
 // supported by the TamaGo framework for bare metal Go on ARM SoCs, see
-// https://github.com/f-secure-foundry/tamago.
+// https://github.com/usbarmory/tamago.
 package disk
 
 import (
@@ -23,7 +23,7 @@ import (
 
 	"github.com/dsoprea/go-ext4"
 
-	"github.com/f-secure-foundry/tamago/soc/imx6/usdhc"
+	"github.com/usbarmory/tamago/soc/imx6/usdhc"
 )
 
 // Partition represents an SD/MMC card partition, only ext4 filesystems are

@@ -61,14 +61,14 @@ check_env:
 
 check_tamago:
 	@if [ "${TAMAGO}" == "" ] || [ ! -f "${TAMAGO}" ]; then \
-		echo 'You need to set the TAMAGO variable to a compiled version of https://github.com/f-secure-foundry/tamago-go'; \
+		echo 'You need to set the TAMAGO variable to a compiled version of https://github.com/usbarmory/tamago-go'; \
 		exit 1; \
 	fi
 
 check_hab_keys:
 	@if [ "${HAB_KEYS}" == "" ]; then \
 		echo 'You need to set the HAB_KEYS variable to the path of secure boot keys'; \
-		echo 'See https://github.com/f-secure-foundry/usbarmory/wiki/Secure-boot-(Mk-II)'; \
+		echo 'See https://github.com/usbarmory/usbarmory/wiki/Secure-boot-(Mk-II)'; \
 		exit 1; \
 	fi
 
@@ -87,7 +87,7 @@ $(APP): check_tamago check_env
 
 $(APP).dcd: check_tamago
 $(APP).dcd: GOMODCACHE=$(shell ${TAMAGO} env GOMODCACHE)
-$(APP).dcd: TAMAGO_PKG=$(shell grep "github.com/f-secure-foundry/tamago v" go.mod | awk '{print $$1"@"$$2}')
+$(APP).dcd: TAMAGO_PKG=$(shell grep "github.com/usbarmory/tamago v" go.mod | awk '{print $$1"@"$$2}')
 $(APP).dcd: dcd
 
 $(APP).bin: CROSS_COMPILE=arm-none-eabi-
@@ -106,7 +106,7 @@ $(APP).imx: $(APP).bin $(APP).dcd
 #### secure boot ####
 
 $(APP)-signed.imx: check_hab_keys $(APP).imx
-	${TAMAGO} install github.com/f-secure-foundry/crucible/cmd/habtool
+	${TAMAGO} install github.com/usbarmory/crucible/cmd/habtool
 	$(shell ${TAMAGO} env GOPATH)/bin/habtool \
 		-A ${HAB_KEYS}/CSF_1_key.pem \
 		-a ${HAB_KEYS}/CSF_1_crt.pem \

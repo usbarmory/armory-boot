@@ -1,4 +1,4 @@
-// https://github.com/f-secure-foundry/armory-boot
+// https://github.com/usbarmory/armory-boot
 //
 // Copyright (c) F-Secure Corporation
 // https://foundry.f-secure.com
@@ -11,7 +11,7 @@ package main
 import (
 	_ "unsafe"
 
-	"github.com/f-secure-foundry/tamago/dma"
+	"github.com/usbarmory/tamago/dma"
 )
 
 // Override imx6ul.ramStart, usbarmory.ramSize and dma allocation, as the

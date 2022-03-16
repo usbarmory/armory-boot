@@ -4,7 +4,7 @@ Introduction
 This tool implements a minimal set of the Serial Download Protocol (SDP), used
 on NXP i.MX SoC application processors, to load an executable image over USB.
 
-The tool is aimed at [USB armory Mk II](https://github.com/f-secure-foundry/usbarmory/wiki) users but should work
+The tool is aimed at [USB armory Mk II](https://github.com/usbarmory/usbarmory/wiki) users but should work
 with all SoCs from the i.MX series capable of USB HID based SDP (only tested
 devices are listed as supported, Pull Requests are welcome to expand this set).
 
@@ -16,20 +16,20 @@ Serial Download Protocol
 ========================
 
 The `armory-boot-usb` command line utility allows to load an imx executable
-through USB using [SDP](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp),
+through USB using [SDP](https://github.com/usbarmory/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp),
 useful for testing or initial provisioning purposes.
 
 You can automatically download, compile and install the utility, under your
 GOPATH, as follows:
 
 ```
-go install github.com/f-secure-foundry/armory-boot/cmd/armory-boot-usb@latest
+go install github.com/usbarmory/armory-boot/cmd/armory-boot-usb@latest
 ```
 
 Alternatively you can manually compile it from source:
 
 ```
-git clone https://github.com/f-secure-foundry/armory-boot
+git clone https://github.com/usbarmory/armory-boot
 cd armory-boot && make armory-boot-usb
 ```
 
@@ -40,10 +40,10 @@ make armory-boot-usb.exe
 ```
 
 Pre-compiled binaries for Linux and Windows are released
-[here](https://github.com/f-secure-foundry/armory-boot/releases).
+[here](https://github.com/usbarmory/armory-boot/releases).
 
 The utility is meant to be used on devices running in
-[USB SDP mode](https://github.com/f-secure-foundry/usbarmory/wiki/Boot-Modes-(Mk-II)):
+[USB SDP mode](https://github.com/usbarmory/usbarmory/wiki/Boot-Modes-(Mk-II)):
 
 ```
 sudo armory-boot-usb -i armory-boot.imx
@@ -64,8 +64,8 @@ andrea.barisani@f-secure.com | andrea@inversepath.com
 License
 =======
 
-armory-boot | https://github.com/f-secure-foundry/armory-boot  
+armory-boot | https://github.com/usbarmory/armory-boot  
 Copyright (c) F-Secure Corporation
 
 These source files are distributed under the BSD-style license found in the
-[LICENSE](https://github.com/f-secure-foundry/armory-boot/blob/master/LICENSE) file.
+[LICENSE](https://github.com/usbarmory/armory-boot/blob/master/LICENSE) file.

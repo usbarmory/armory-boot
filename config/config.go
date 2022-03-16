@@ -1,4 +1,4 @@
-// https://github.com/f-secure-foundry/armory-boot
+// https://github.com/usbarmory/armory-boot
 //
 // Copyright (c) F-Secure Corporation
 // https://foundry.f-secure.com
@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/f-secure-foundry/armory-boot/disk"
+	"github.com/usbarmory/armory-boot/disk"
 )
 
 // DefaultConfigPath is the default armory-boot configuration file path.
