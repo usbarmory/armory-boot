@@ -216,13 +216,13 @@ Authors
 =======
 
 Andrea Barisani  
-andrea.barisani@f-secure.com | andrea@inversepath.com  
+andrea.barisani@withsecure.com | andrea@inversepath.com  
 
 License
 =======
 
 armory-boot | https://github.com/usbarmory/armory-boot  
-Copyright (c) F-Secure Corporation
+Copyright (c) WithSecure Corporation
 
 These source files are distributed under the BSD-style license found in the
 [LICENSE](https://github.com/usbarmory/armory-boot/blob/master/LICENSE) file.
