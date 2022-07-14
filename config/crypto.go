@@ -14,13 +14,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/usbarmory/tamago/soc/imx6"
-	"github.com/usbarmory/tamago/soc/imx6/dcp"
+	"github.com/usbarmory/tamago/soc/imx6/imx6ul"
 )
 
 func init() {
-	if imx6.Native {
-		dcp.Init()
+	if imx6ul.Native {
+		imx6ul.DCP.Init()
 	}
 }
 
@@ -65,7 +64,7 @@ func Verify(buf []byte, sig []byte, pubKey string) (err error) {
 // This function is only meant to be used with `GOOS=tamago GOARCH=arm` on
 // i.MX6 targets.
 func CompareHash(buf []byte, s string) (valid bool) {
-	sum, err := dcp.Sum256(buf)
+	sum, err := imx6ul.DCP.Sum256(buf)
 
 	if err != nil {
 		return false
