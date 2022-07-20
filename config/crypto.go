@@ -14,11 +14,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/usbarmory/tamago/soc/imx6"
 	"github.com/usbarmory/tamago/soc/imx6/imx6ul"
 )
 
 func init() {
-	if imx6ul.Native {
+	if imx6.Native {
 		imx6ul.DCP.Init()
 	}
 }
