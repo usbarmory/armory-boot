@@ -19,7 +19,7 @@ import (
 	"log"
 
 	"github.com/usbarmory/tamago/arm"
-	"github.com/usbarmory/tamago/soc/imx6"
+	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
 )
 
 // defined in boot.s
@@ -34,9 +34,9 @@ func boot(kernel uint32, params uint32, cleanup func()) (err error) {
 
 		cleanup()
 
-		imx6.ARM.DisableInterrupts()
-		imx6.ARM.FlushDataCache()
-		imx6.ARM.DisableCache()
+		imx6ul.ARM.DisableInterrupts()
+		imx6ul.ARM.FlushDataCache()
+		imx6ul.ARM.DisableCache()
 
 		log.Printf("armory-boot: starting kernel@%x params@%x\n", kernel, params)
 		exec(kernel, params)

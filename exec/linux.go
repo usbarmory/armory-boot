@@ -139,18 +139,18 @@ func (image *LinuxImage) Load() (err error) {
 			return errors.New("initrd requires dtb")
 		}
 
-		if err = image.fixupInitrd(image.Region.Start); err != nil {
+		if err = image.fixupInitrd(image.Region.Start()); err != nil {
 			return fmt.Errorf("initrd dtb fixup error, %v", err)
 		}
 
-		image.Region.Write(image.Region.Start, image.InitialRamDiskOffset, image.InitialRamDisk)
+		image.Region.Write(image.Region.Start(), image.InitialRamDiskOffset, image.InitialRamDisk)
 	}
 
-	image.Region.Write(image.Region.Start, image.KernelOffset, image.Kernel)
-	image.Region.Write(image.Region.Start, image.DeviceTreeBlobOffset, image.DeviceTreeBlob)
+	image.Region.Write(image.Region.Start(), image.KernelOffset, image.Kernel)
+	image.Region.Write(image.Region.Start(), image.DeviceTreeBlobOffset, image.DeviceTreeBlob)
 
-	image.entry = image.Region.Start + uint32(image.KernelOffset)
-	image.dtb = image.Region.Start + uint32(image.DeviceTreeBlobOffset)
+	image.entry = image.Region.Start() + uint32(image.KernelOffset)
+	image.dtb = image.Region.Start() + uint32(image.DeviceTreeBlobOffset)
 	image.loaded = true
 
 	return

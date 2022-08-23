@@ -23,7 +23,7 @@ import (
 
 	"github.com/dsoprea/go-ext4"
 
-	"github.com/usbarmory/tamago/soc/imx6/usdhc"
+	"github.com/usbarmory/tamago/soc/nxp/usdhc"
 )
 
 // Partition represents an SD/MMC card partition, only ext4 filesystems are

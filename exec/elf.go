@@ -54,17 +54,17 @@ func (image *ELFImage) Load() (err error) {
 			return fmt.Errorf("failed to read LOAD section at idx %d, %q", idx, err)
 		}
 
-		if uint32(prg.Paddr) < image.Region.Start {
+		if uint32(prg.Paddr) < image.Region.Start() {
 			return fmt.Errorf("incompatible memory layout (paddr:%x)", prg.Paddr)
 		}
 
-		off := uint32(prg.Paddr) - image.Region.Start
+		off := uint32(prg.Paddr) - image.Region.Start()
 
-		if off > uint32(image.Region.Size) {
+		if off > image.Region.Size() {
 			return fmt.Errorf("incompatible memory layout (paddr:%x off:%x)", prg.Paddr, off)
 		}
 
-		image.Region.Write(image.Region.Start, int(off), b)
+		image.Region.Write(image.Region.Start(), int(off), b)
 	}
 
 	image.entry = uint32(f.Entry)
