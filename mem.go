@@ -45,11 +45,6 @@ const (
 func init() {
 	dma.Init(dmaStart, dmaSize)
 
-	mem = &dma.Region{
-		Start: memoryStart,
-		Size:  memorySize,
-	}
-
-	mem.Init()
+	mem, _ = dma.NewRegion(memoryStart, memorySize, false)
 	mem.Reserve(memorySize, 0)
 }
