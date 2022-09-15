@@ -42,8 +42,8 @@ type LinuxImage struct {
 	// CmdLine is the Linux kernel command line arguments.
 	CmdLine string
 
-	entry  uint32
-	dtb    uint32
+	entry  uint
+	dtb    uint
 	loaded bool
 }
 
@@ -85,30 +85,30 @@ func (image *LinuxImage) fixupBootArgs() (err error) {
 	return image.updateDTB(fdt)
 }
 
-func (image *LinuxImage) fixupInitrd(addr uint32) (err error) {
+func (image *LinuxImage) fixupInitrd(addr uint) (err error) {
 	fdt, err := image.fdt()
 
 	if err != nil {
 		return
 	}
 
-	start := addr + uint32(image.InitialRamDiskOffset)
-	end := start + uint32(len(image.InitialRamDisk))
+	start := addr + uint(image.InitialRamDiskOffset)
+	end := start + uint(len(image.InitialRamDisk))
 
 	for _, node := range fdt.RootNode.Children {
 		if node.Name == "chosen" {
 			initrdStart := dt.Property{
 				Name:  "linux,initrd-start",
-				Value: make([]byte, 4),
+				Value: make([]byte, 8),
 			}
 
 			initrdEnd := dt.Property{
 				Name:  "linux,initrd-end",
-				Value: make([]byte, 4),
+				Value: make([]byte, 8),
 			}
 
-			binary.BigEndian.PutUint32(initrdStart.Value, start)
-			binary.BigEndian.PutUint32(initrdEnd.Value, end)
+			binary.BigEndian.PutUint64(initrdStart.Value, uint64(start))
+			binary.BigEndian.PutUint64(initrdEnd.Value, uint64(end))
 
 			node.Properties = append(node.Properties, initrdStart)
 			node.Properties = append(node.Properties, initrdEnd)
@@ -149,20 +149,20 @@ func (image *LinuxImage) Load() (err error) {
 	image.Region.Write(image.Region.Start(), image.KernelOffset, image.Kernel)
 	image.Region.Write(image.Region.Start(), image.DeviceTreeBlobOffset, image.DeviceTreeBlob)
 
-	image.entry = image.Region.Start() + uint32(image.KernelOffset)
-	image.dtb = image.Region.Start() + uint32(image.DeviceTreeBlobOffset)
+	image.entry = image.Region.Start() + uint(image.KernelOffset)
+	image.dtb = image.Region.Start() + uint(image.DeviceTreeBlobOffset)
 	image.loaded = true
 
 	return
 }
 
 // Entry returns the image entry address.
-func (image *LinuxImage) Entry() uint32 {
+func (image *LinuxImage) Entry() uint {
 	return image.entry
 }
 
 // DTB returns the image DTB address.
-func (image *LinuxImage) DTB() uint32 {
+func (image *LinuxImage) DTB() uint {
 	return image.dtb
 }
 

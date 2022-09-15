@@ -26,7 +26,7 @@ import (
 func exec(kernel uint32, params uint32)
 func svc()
 
-func boot(kernel uint32, params uint32, cleanup func()) (err error) {
+func boot(kernel uint, params uint, cleanup func()) (err error) {
 	arm.SystemExceptionHandler = func(n int) {
 		if n != arm.SUPERVISOR {
 			panic("unhandled exception")
@@ -38,8 +38,8 @@ func boot(kernel uint32, params uint32, cleanup func()) (err error) {
 		imx6ul.ARM.FlushDataCache()
 		imx6ul.ARM.DisableCache()
 
-		log.Printf("armory-boot: starting kernel@%x params@%x\n", kernel, params)
-		exec(kernel, params)
+		log.Printf("armory-boot: starting kernel@%.8x params@%.8x\n", kernel, params)
+		exec(uint32(kernel), uint32(params))
 	}
 
 	svc()

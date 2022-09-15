@@ -11,6 +11,6 @@ package exec
 // BootImage represents a bootable image.
 type BootImage interface {
 	Load() error
-	Entry() uint32
+	Entry() uint
 	Boot(cleanup func()) error
 }

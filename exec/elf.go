@@ -24,7 +24,7 @@ type ELFImage struct {
 	// ELF is a bootable bare-metal ELF image.
 	ELF []byte
 
-	entry  uint32
+	entry  uint
 	loaded bool
 }
 
@@ -54,11 +54,11 @@ func (image *ELFImage) Load() (err error) {
 			return fmt.Errorf("failed to read LOAD section at idx %d, %q", idx, err)
 		}
 
-		if uint32(prg.Paddr) < image.Region.Start() {
+		if uint(prg.Paddr) < image.Region.Start() {
 			return fmt.Errorf("incompatible memory layout (paddr:%x)", prg.Paddr)
 		}
 
-		off := uint32(prg.Paddr) - image.Region.Start()
+		off := uint(prg.Paddr) - image.Region.Start()
 
 		if off > image.Region.Size() {
 			return fmt.Errorf("incompatible memory layout (paddr:%x off:%x)", prg.Paddr, off)
@@ -67,14 +67,14 @@ func (image *ELFImage) Load() (err error) {
 		image.Region.Write(image.Region.Start(), int(off), b)
 	}
 
-	image.entry = uint32(f.Entry)
+	image.entry = uint(f.Entry)
 	image.loaded = true
 
 	return
 }
 
 // Entry returns the image entry address.
-func (image *ELFImage) Entry() uint32 {
+func (image *ELFImage) Entry() uint {
 	return image.entry
 }
 
