@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"strconv"
 
-	usbarmory "github.com/usbarmory/tamago/board/usbarmory/mk2"
+	"github.com/usbarmory/tamago/soc/nxp/usdhc"
 )
 
 // DefaultBootDevice is the default boot device
@@ -26,8 +26,12 @@ const DefaultOffset = 5242880
 // microSD card ("uSD") as boot device, an ext4 partition must be present at
 // the passed start offset. An empty value for device or start parameter selects
 // its default value.
-func Detect(device string, start string) (part *Partition, err error) {
+func Detect(card *usdhc.USDHC, start string) (part *Partition, err error) {
 	offset := int64(DefaultOffset)
+
+	if card == nil {
+		return nil, errors.New("invalid card")
+	}
 
 	if len(start) > 0 {
 		if offset, err = strconv.ParseInt(start, 10, 64); err != nil {
@@ -36,24 +40,12 @@ func Detect(device string, start string) (part *Partition, err error) {
 	}
 
 	part = &Partition{
+		Card:   card,
 		Offset: offset,
 	}
 
-	if len(device) == 0 {
-		device = DefaultBootDevice
-	}
-
-	switch device {
-	case "eMMC":
-		part.Card = usbarmory.MMC
-	case "uSD":
-		part.Card = usbarmory.SD
-	default:
-		return nil, errors.New("invalid boot parameter")
-	}
-
 	if err := part.Card.Detect(); err != nil {
-		return nil, fmt.Errorf("could not detect %s, %v\n", device, err)
+		return nil, fmt.Errorf("could not detect card, %v\n", err)
 	}
 
 	return

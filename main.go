@@ -18,6 +18,7 @@ import (
 
 	usbarmory "github.com/usbarmory/tamago/board/usbarmory/mk2"
 	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
+	"github.com/usbarmory/tamago/soc/nxp/usdhc"
 )
 
 var Build string
@@ -43,10 +44,21 @@ func preLaunch() {
 }
 
 func main() {
+	var card *usdhc.USDHC
+
 	usbarmory.LED("blue", false)
 	usbarmory.LED("white", false)
 
-	part, err := disk.Detect(Boot, Start)
+	switch Boot {
+	case "eMMC":
+		card = usbarmory.MMC
+	case "uSD":
+		card = usbarmory.SD
+	default:
+		panic("invalid boot parameter")
+	}
+
+	part, err := disk.Detect(card, Start)
 
 	if err != nil {
 		panic(fmt.Sprintf("boot media error, %v\n", err))
