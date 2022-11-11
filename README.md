@@ -38,7 +38,7 @@ Build the `armory-boot.imx` application executable:
 
 ```
 git clone https://github.com/usbarmory/armory-boot && cd armory-boot
-make CROSS_COMPILE=arm-none-eabi- imx BOOT=uSD START=5242880
+make imx BOOT=uSD START=5242880
 ```
 
 Installing
@@ -137,7 +137,7 @@ minisign -G -p armory-boot.pub -s armory-boot.sec
 Compilation with embedded key:
 
 ```
-make CROSS_COMPILE=arm-none-eabi- imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
+make imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
 ```
 
 When `armory-boot` is compiled with the `PUBLIC_KEY` variable, a signature for
