@@ -16,7 +16,6 @@ package exec
 
 import (
 	"errors"
-	"log"
 
 	"github.com/usbarmory/tamago/arm"
 	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
@@ -38,7 +37,6 @@ func boot(kernel uint, params uint, cleanup func()) (err error) {
 		imx6ul.ARM.FlushDataCache()
 		imx6ul.ARM.DisableCache()
 
-		log.Printf("armory-boot: starting kernel@%.8x params@%.8x\n", kernel, params)
 		exec(uint32(kernel), uint32(params))
 	}
 

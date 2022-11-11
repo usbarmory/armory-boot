@@ -104,6 +104,8 @@ func main() {
 		panic(fmt.Sprintf("load error, %v\n", err))
 	}
 
+	log.Printf("armory-boot: starting kernel@%.8x\n", image.Entry())
+
 	if err = image.Boot(preLaunch); err != nil {
 		panic(fmt.Sprintf("load error, %v\n", err))
 	}
