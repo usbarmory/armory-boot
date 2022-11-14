@@ -41,6 +41,24 @@ git clone https://github.com/usbarmory/armory-boot && cd armory-boot
 make imx BOOT=uSD START=5242880
 ```
 
+Docker
+------
+
+For convenience a docker configuration is provided.
+
+Ensure docker daemon is running and build the `armory-boot` docker image,
+this needs to be done only the first time:
+
+```
+docker build --build-arg UID=$UID --build-arg GID=$UID -t armory-boot docker
+```
+
+You can enter to the container as follows:
+
+```
+docker run -it --rm -v $PWD:/build armory-boot
+```
+
 Installing
 ==========
 
