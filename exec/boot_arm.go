@@ -33,7 +33,6 @@ func boot(kernel uint, params uint, cleanup func()) (err error) {
 
 		cleanup()
 
-		imx6ul.ARM.DisableInterrupts()
 		imx6ul.ARM.FlushDataCache()
 		imx6ul.ARM.DisableCache()
 
