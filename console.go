@@ -1,35 +1,42 @@
-// https://github.com/usbarmory/armory-boot
-//
 // Copyright (c) WithSecure Corporation
 // https://foundry.withsecure.com
 //
 // Use of this source code is governed by the license
 // that can be found in the LICENSE file.
 
-//go:build console
-// +build console
+//go:build !console
+// +build !console
 
 package main
 
 import (
-	"fmt"
+	"io"
 	"log"
-	"runtime"
-	"time"
+	_ "unsafe"
 
-	usbarmory "github.com/usbarmory/tamago/board/usbarmory/mk2"
 	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
 )
 
+// This bootloader does not log any sensitive information to the serial
+// console, however it is desirable to silence any potential stack trace or
+// runtime errors to avoid unwanted information leaks.
+//
+// The TamaGo board support for the USB armory Mk II enables the serial console
+// (UART2) at runtime initialization, which therefore invokes imx6.UART2.Init()
+// before init().
+//
+// To this end the runtime printk function, responsible for all console logging
+// operations (i.e. stdout/stderr), is overridden with a NOP. Secondarily UART2
+// is disabled at the first opportunity (init()).
+
 func init() {
-	debugConsole, _ := usbarmory.DetectDebugAccessory(250 * time.Millisecond)
-	<-debugConsole
+	// disable console
+	imx6ul.UART2.Disable()
+	// silence logging
+	log.SetOutput(io.Discard)
+}
 
-	banner := fmt.Sprintf("armory-boot • %s/%s (%s) • %s %s • %s",
-		runtime.GOOS, runtime.GOARCH, runtime.Version(),
-		Revision, Build,
-		imx6ul.Model())
-
-	log.SetFlags(0)
-	log.Printf("%s", banner)
+//go:linkname printk runtime.printk
+func printk(c byte) {
+	// ensure that any serial output is supressed before UART2 disabling
 }
