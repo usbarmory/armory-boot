@@ -10,6 +10,7 @@ package config
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -18,7 +19,7 @@ import (
 )
 
 func init() {
-	if imx6ul.Native {
+	if imx6ul.DCP != nil {
 		imx6ul.DCP.Init()
 	}
 }
@@ -64,7 +65,14 @@ func Verify(buf []byte, sig []byte, pubKey string) (err error) {
 // This function is only meant to be used with `GOOS=tamago GOARCH=arm` on
 // i.MX6 targets.
 func CompareHash(buf []byte, s string) (valid bool) {
-	sum, err := imx6ul.DCP.Sum256(buf)
+	var sum [32]byte
+	var err error
+
+	if imx6ul.DCP != nil {
+		sum, err = imx6ul.DCP.Sum256(buf)
+	} else {
+		sum = sha256.Sum256(buf)
+	}
 
 	if err != nil {
 		return false
