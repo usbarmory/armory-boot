@@ -6,7 +6,7 @@ require (
 	github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8
 	github.com/u-root/u-root v0.11.0
 	github.com/usbarmory/hid v0.0.0-20210318233634-85ced88a1ffe
-	github.com/usbarmory/tamago v0.0.0-20230418081853-3fd212f3d643
+	github.com/usbarmory/tamago v0.0.0-20230717094045-30b5bacaaaf0
 	golang.org/x/crypto v0.8.0
 )
 

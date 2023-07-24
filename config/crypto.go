@@ -68,9 +68,12 @@ func CompareHash(buf []byte, s string) (valid bool) {
 	var sum [32]byte
 	var err error
 
-	if imx6ul.DCP != nil {
+	switch {
+	case imx6ul.CAAM != nil:
+		sum, err = imx6ul.CAAM.Sum256(buf)
+	case imx6ul.DCP != nil:
 		sum, err = imx6ul.DCP.Sum256(buf)
-	} else {
+	default:
 		sum = sha256.Sum256(buf)
 	}
 
