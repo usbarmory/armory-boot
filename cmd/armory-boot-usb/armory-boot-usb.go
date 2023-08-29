@@ -142,7 +142,7 @@ func dcdWrite(dcd []byte, addr uint32) (err error) {
 		return
 	}
 
-	_, err = sendHIDReport(H2D_DATA, r2, D2H_RESPONSE)
+	_, err = sendHIDReport(H2D_DATA, r2, D2H_RESPONSE_LAST)
 
 	return
 }
