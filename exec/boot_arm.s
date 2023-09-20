@@ -10,20 +10,25 @@
 TEXT ·svc(SB),$0
 	SWI	$0
 
-// func exec(kernel uint32, params uint32)
-TEXT ·exec(SB),$0-8
+// func exec(kernel uint32, params uint32, mmu bool)
+TEXT ·exec(SB),$0-12
 	MOVW	kernel+0(FP), R3
 	MOVW	params+4(FP), R4
+	MOVW	mmu+8(FP), R5
+
+	CMP	$1, R5
+	B.EQ	mmu
 
 	// Disable MMU
 	MRC	15, 0, R0, C1, C0, 0
 	BIC	$1, R0
 	MCR	15, 0, R0, C1, C0, 0
-
-	// CPU register 0 must be 0
+mmu:
+	// When booting Linux:
+	//   - CPU register 0 must be 0
+	//   - CPU register 1 not required for DTB boot
+	//   - CPU register 2 must be the parameter list address
 	MOVW	$0, R0
-	// CPU register 1 not required for DTB boot
-	// CPU register 2 must be the parameter list address
 	MOVW	R4, R2
 
 	// Jump to kernel image

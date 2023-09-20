@@ -7,6 +7,6 @@
 // that can be found in the LICENSE file.
 package exec
 
-func boot(kernel uint, params uint, cleanup func()) (err error) {
+func boot(kernel uint, params uint, cleanup func(), mmu bool) (err error) {
 	panic("unimplemented")
 }

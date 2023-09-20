@@ -22,10 +22,10 @@ import (
 )
 
 // defined in boot.s
-func exec(kernel uint32, params uint32)
+func exec(kernel uint32, params uint32, mmu bool)
 func svc()
 
-func boot(kernel uint, params uint, cleanup func()) (err error) {
+func boot(kernel uint, params uint, cleanup func(), mmu bool) (err error) {
 	arm.SystemExceptionHandler = func(n int) {
 		if n != arm.SUPERVISOR {
 			panic("unhandled exception")
@@ -36,7 +36,7 @@ func boot(kernel uint, params uint, cleanup func()) (err error) {
 		imx6ul.ARM.FlushDataCache()
 		imx6ul.ARM.DisableCache()
 
-		exec(uint32(kernel), uint32(params))
+		exec(uint32(kernel), uint32(params), mmu)
 	}
 
 	svc()

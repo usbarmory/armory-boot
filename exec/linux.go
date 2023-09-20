@@ -172,5 +172,5 @@ func (image *LinuxImage) Boot(cleanup func()) (err error) {
 		return errors.New("Load() kernel before Boot()")
 	}
 
-	return boot(image.entry, image.dtb, cleanup)
+	return boot(image.entry, image.dtb, cleanup, false)
 }

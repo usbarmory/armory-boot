@@ -84,5 +84,5 @@ func (image *ELFImage) Boot(cleanup func()) (err error) {
 		return errors.New("Load() kernel before Boot()")
 	}
 
-	return boot(image.entry, 0, cleanup)
+	return boot(image.entry, 0, cleanup, true)
 }
