@@ -33,8 +33,10 @@ func boot(kernel uint, params uint, cleanup func(), mmu bool) (err error) {
 
 		cleanup()
 
-		imx6ul.ARM.FlushDataCache()
-		imx6ul.ARM.DisableCache()
+		if !mmu {
+			imx6ul.ARM.FlushDataCache()
+			imx6ul.ARM.DisableCache()
+		}
 
 		exec(uint32(kernel), uint32(params), mmu)
 	}
