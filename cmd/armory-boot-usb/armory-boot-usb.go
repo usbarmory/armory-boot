@@ -20,6 +20,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"os"
 	"runtime"
 	"time"
@@ -55,9 +56,10 @@ var supportedDevices = map[uint16]string{
 }
 
 type Config struct {
-	input   string
-	timeout int
-	dev     hid.Device
+	dev      hid.Device
+	timeout  int
+	input    string
+	register string
 }
 
 var conf *Config
@@ -70,6 +72,7 @@ func init() {
 
 	flag.IntVar(&conf.timeout, "t", 5, "timeout in seconds for command responses")
 	flag.StringVar(&conf.input, "i", "", "imx file")
+	flag.StringVar(&conf.register, "r", "0x021bc400", "read register")
 }
 
 // detect compatible devices in SDP mode
@@ -131,6 +134,20 @@ func sendHIDReport(reqID int, buf []byte, resID int) (res []byte, err error) {
 			return nil, errors.New("command timeout")
 		}
 	}
+}
+
+func readRegister(addr uint32) {
+	n := uint32(4)
+	r1 := sdp.BuildReadRegisterReport(addr, n)
+
+	log.Printf("reading %d bytes at %#x", n, addr)
+	res, err := sendHIDReport(H2D_COMMAND, r1, D2H_RESPONSE_LAST)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("%#.8x: %x", addr, res)
 }
 
 func dcdWrite(dcd []byte, addr uint32) (err error) {
@@ -204,22 +221,9 @@ func jumpAddress(addr uint32) (err error) {
 	return
 }
 
-func main() {
-	var err error
-
-	flag.Parse()
-
-	if len(conf.input) <= 0 {
-		flag.PrintDefaults()
-		return
-	}
-
-	if err = detect(); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("parsing %s", conf.input)
-	imx, err := ioutil.ReadFile(conf.input)
+func writeAndJump(input string) {
+	log.Printf("parsing %s", input)
+	imx, err := ioutil.ReadFile(input)
 
 	if err != nil {
 		log.Fatal(err)
@@ -259,4 +263,25 @@ func main() {
 	}
 
 	log.Printf("serial download complete")
+}
+
+func main() {
+	var err error
+
+	flag.Parse()
+
+	if err = detect(); err != nil {
+		log.Fatal(err)
+	}
+
+	switch {
+	case len(conf.input) > 0:
+		writeAndJump(conf.input)
+	case len(conf.register) > 0:
+		addr := new(big.Int)
+		addr.SetString(conf.register, 0)
+		readRegister(uint32(addr.Int64()))
+	default:
+		flag.PrintDefaults()
+	}
 }

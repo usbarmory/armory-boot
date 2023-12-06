@@ -20,6 +20,7 @@ const HIDReportSize = 1024
 // SDP command types
 // (p322, 8.9.3 Serial Download Protocol (SDP), IMX6ULLRM).
 const (
+	ReadRegister  = 0x0101
 	WriteFile     = 0x0404
 	DCDWrite      = 0x0a0a
 	JumpAddress   = 0x0b0b
@@ -42,6 +43,20 @@ func (s *SDP) Bytes() []byte {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, s)
 	return buf.Bytes()
+}
+
+// BuildReadRegisterReport generates USB HID reports (ID 1) that implement the
+// SDP READ_REGISTER command for reading a single 32-bit device register value
+// (p323, 8.9.3.1.1 READ_REGISTER, IMX6ULLRM).
+func BuildReadRegisterReport(addr uint32, size uint32) (r1 []byte) {
+	sdp := &SDP{
+		CommandType: ReadRegister,
+		Address:     addr,
+		Format:      0x20, // 32-bit access
+		DataCount:   size,
+	}
+
+	return sdp.Bytes()
 }
 
 // BuildDCDWriteReport generates USB HID reports (IDs 1 and 2) that implement
@@ -88,7 +103,7 @@ func BuildFileWriteReport(imx []byte, addr uint32) (r1 []byte, r2 [][]byte) {
 
 // BuildJumpAddressReport generates the USB HID report (ID 1) that implements
 // the SDP JUMP_ADDRESS command, used to execute an imx binary payload
-// (p328, // 8.9.3.1.7 JUMP_ADDRESS, IMX6ULLRM).
+// (p328, 8.9.3.1.7 JUMP_ADDRESS, IMX6ULLRM).
 func BuildJumpAddressReport(addr uint32) (r1 []byte) {
 	sdp := &SDP{
 		CommandType: JumpAddress,
