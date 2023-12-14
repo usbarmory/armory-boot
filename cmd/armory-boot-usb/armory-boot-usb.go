@@ -39,7 +39,7 @@ const (
 )
 
 // SDP HID report IDs
-// (p327, 8.9.3.1 SDP commands, IMX6ULLRM).
+// (p323, 8.9.3.1 SDP commands, IMX6ULLRM).
 const (
 	H2D_COMMAND       = 1 // Command  - Host to Device
 	H2D_DATA          = 2 // Data     - Host to Device
@@ -56,6 +56,7 @@ var supportedDevices = map[uint16]string{
 }
 
 type Config struct {
+	inf      *hid.DeviceInfo
 	dev      hid.Device
 	timeout  int
 	input    string
@@ -94,6 +95,7 @@ func detect() (err error) {
 			continue
 		}
 
+		conf.inf = d
 		conf.dev, err = d.Open()
 
 		if err != nil {
@@ -110,25 +112,28 @@ func detect() (err error) {
 	return
 }
 
-func sendHIDReport(reqID int, buf []byte, resID int) (res []byte, err error) {
-	err = conf.dev.Write(append([]byte{byte(reqID)}, buf...))
+func sendHIDReport(reqID int, req []byte, resID int, n int) (res []byte, err error) {
+	p := append([]byte{byte(reqID)}, req...)
 
-	if err != nil || resID < 0 {
+	if err = conf.dev.Write(p); err != nil || resID < 0 {
 		return
 	}
 
-	ok := false
+	if n > 0 {
+		conf.inf.InputReportLength = 1 + uint16(n)
+	}
+
 	timer := time.After(time.Duration(conf.timeout) * time.Second)
 
 	for {
 		select {
-		case res, ok = <-conf.dev.ReadCh():
+		case res, ok := <-conf.dev.ReadCh():
 			if !ok {
 				return nil, errors.New("error reading response")
 			}
 
 			if len(res) > 0 && res[0] == byte(resID) {
-				return
+				return res[1:], nil
 			}
 		case <-timer:
 			return nil, errors.New("command timeout")
@@ -136,12 +141,11 @@ func sendHIDReport(reqID int, buf []byte, resID int) (res []byte, err error) {
 	}
 }
 
-func readRegister(addr uint32) {
-	n := uint32(4)
-	r1 := sdp.BuildReadRegisterReport(addr, n)
+func readRegister(addr uint32, n int) {
+	r1 := sdp.BuildReadRegisterReport(addr, uint32(n))
 
 	log.Printf("reading %d bytes at %#x", n, addr)
-	res, err := sendHIDReport(H2D_COMMAND, r1, D2H_RESPONSE_LAST)
+	res, err := sendHIDReport(H2D_COMMAND, r1, D2H_RESPONSE_LAST, n)
 
 	if err != nil {
 		log.Fatal(err)
@@ -153,13 +157,13 @@ func readRegister(addr uint32) {
 func dcdWrite(dcd []byte, addr uint32) (err error) {
 	r1, r2 := sdp.BuildDCDWriteReport(dcd, addr)
 
-	_, err = sendHIDReport(H2D_COMMAND, r1, -1)
+	_, err = sendHIDReport(H2D_COMMAND, r1, -1, -1)
 
 	if err != nil {
 		return
 	}
 
-	_, err = sendHIDReport(H2D_DATA, r2, D2H_RESPONSE_LAST)
+	_, err = sendHIDReport(H2D_DATA, r2, D2H_RESPONSE_LAST, -1)
 
 	return
 }
@@ -167,7 +171,7 @@ func dcdWrite(dcd []byte, addr uint32) (err error) {
 func fileWrite(imx []byte, addr uint32) (err error) {
 	r1, r2 := sdp.BuildFileWriteReport(imx, addr)
 
-	_, err = sendHIDReport(H2D_COMMAND, r1, -1)
+	_, err = sendHIDReport(H2D_COMMAND, r1, -1, -1)
 
 	if err != nil {
 		return
@@ -181,7 +185,7 @@ func fileWrite(imx []byte, addr uint32) (err error) {
 			resID = D2H_RESPONSE_LAST
 		}
 	send:
-		_, err = sendHIDReport(H2D_DATA, r, resID)
+		_, err = sendHIDReport(H2D_DATA, r, resID, -1)
 
 		if err != nil && runtime.GOOS == "darwin" && err.Error() == "hid: general error" {
 			// On macOS access contention with the OS causes
@@ -198,7 +202,7 @@ func fileWrite(imx []byte, addr uint32) (err error) {
 					DataCount:   uint32(len(imx)) - off,
 				}
 
-				if _, err = sendHIDReport(H2D_COMMAND, r1.Bytes(), -1); err != nil {
+				if _, err = sendHIDReport(H2D_COMMAND, r1.Bytes(), -1, -1); err != nil {
 					return
 				}
 
@@ -216,7 +220,7 @@ func fileWrite(imx []byte, addr uint32) (err error) {
 
 func jumpAddress(addr uint32) (err error) {
 	r1 := sdp.BuildJumpAddressReport(addr)
-	_, err = sendHIDReport(H2D_COMMAND, r1, -1)
+	_, err = sendHIDReport(H2D_COMMAND, r1, -1, -1)
 
 	return
 }
@@ -280,7 +284,7 @@ func main() {
 	case len(conf.register) > 0:
 		addr := new(big.Int)
 		addr.SetString(conf.register, 0)
-		readRegister(uint32(addr.Int64()))
+		readRegister(uint32(addr.Int64()), 4)
 	default:
 		flag.PrintDefaults()
 	}
