@@ -92,12 +92,14 @@ $(APP).dcd: dcd
 
 $(APP).bin: CROSS_COMPILE=arm-none-eabi-
 $(APP).bin: $(APP)
-	$(CROSS_COMPILE)objcopy -j .text -j .rodata -j .shstrtab -j .typelink \
+	$(CROSS_COMPILE)objcopy --enable-deterministic-archives \
+	    -j .text -j .rodata -j .shstrtab -j .typelink \
 	    -j .itablink -j .gopclntab -j .go.buildinfo -j .noptrdata -j .data \
 	    -j .bss --set-section-flags .bss=alloc,load,contents \
 	    -j .noptrbss --set-section-flags .noptrbss=alloc,load,contents \
 	    $(APP) -O binary $(APP).bin
 
+$(APP).imx: SOURCE_DATE_EPOCH=0
 $(APP).imx: $(APP).bin $(APP).dcd
 	mkimage -n $(APP).dcd -T imximage -e $(TEXT_START) -d $(APP).bin $(APP).imx
 	# Copy entry point from ELF file
