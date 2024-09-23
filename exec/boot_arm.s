@@ -10,11 +10,11 @@
 TEXT ·svc(SB),$0
 	SWI	$0
 
-// func exec(kernel uint32, params uint32, mmu bool)
-TEXT ·exec(SB),$0-12
-	MOVW	kernel+0(FP), R3
-	MOVW	params+4(FP), R4
-	MOVW	mmu+8(FP), R5
+// func exec()
+TEXT ·exec(SB),$0
+	MOVW	·_kernel(SB), R3
+	MOVW	·_params(SB), R4
+	MOVW	·_mmu(SB), R5
 
 	CMP	$1, R5
 	B.EQ	mmu

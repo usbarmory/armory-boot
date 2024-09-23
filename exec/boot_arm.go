@@ -22,23 +22,32 @@ import (
 )
 
 // defined in boot.s
-func exec(kernel uint32, params uint32, mmu bool)
 func svc()
+func exec()
+
+// exec() parameters are passed as pointers to limit stack allocation as it's
+// executed on g0
+var (
+	_kernel uint32
+	_params uint32
+	_mmu    bool
+)
 
 func boot(kernel uint, params uint, cleanup func(), mmu bool) (err error) {
-	arm.SystemExceptionHandler = func(n int) {
-		if n != arm.SUPERVISOR {
-			panic("unhandled exception")
-		}
+	table := arm.SystemVectorTable()
+	table.Supervisor = exec
 
-		cleanup()
+	imx6ul.ARM.SetVectorTable(table)
 
-		if !mmu {
-			imx6ul.ARM.FlushDataCache()
-			imx6ul.ARM.DisableCache()
-		}
+	_kernel = uint32(kernel)
+	_params = uint32(params)
+	_mmu = mmu
 
-		exec(uint32(kernel), uint32(params), mmu)
+	cleanup()
+
+	if !mmu {
+		imx6ul.ARM.FlushDataCache()
+		imx6ul.ARM.DisableCache()
 	}
 
 	svc()
