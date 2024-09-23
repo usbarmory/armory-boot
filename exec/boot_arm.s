@@ -28,8 +28,12 @@ mmu:
 	//   - CPU register 0 must be 0
 	//   - CPU register 1 not required for DTB boot
 	//   - CPU register 2 must be the parameter list address
+	//   - CPU must be in SVC mode
 	MOVW	$0, R0
 	MOVW	R4, R2
+
+	// switch to supervisor mode
+	WORD	$0xf1020013	// cps 0x13
 
 	// Jump to kernel image
 	B	(R3)

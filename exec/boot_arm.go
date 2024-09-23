@@ -17,7 +17,6 @@ package exec
 import (
 	"errors"
 
-	"github.com/usbarmory/tamago/arm"
 	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
 )
 
@@ -26,22 +25,14 @@ func exec(kernel uint32, params uint32, mmu bool)
 func svc()
 
 func boot(kernel uint, params uint, cleanup func(), mmu bool) (err error) {
-	arm.SystemExceptionHandler = func(n int) {
-		if n != arm.SUPERVISOR {
-			panic("unhandled exception")
-		}
+	cleanup()
 
-		cleanup()
-
-		if !mmu {
-			imx6ul.ARM.FlushDataCache()
-			imx6ul.ARM.DisableCache()
-		}
-
-		exec(uint32(kernel), uint32(params), mmu)
+	if !mmu {
+		imx6ul.ARM.FlushDataCache()
+		imx6ul.ARM.DisableCache()
 	}
 
-	svc()
+	exec(uint32(kernel), uint32(params), mmu)
 
 	return errors.New("supervisor failure")
 }
