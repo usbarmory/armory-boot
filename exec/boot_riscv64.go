@@ -7,6 +7,10 @@
 // that can be found in the LICENSE file.
 package exec
 
-func boot(kernel uint, params uint, cleanup func(), mmu bool) (err error) {
+import (
+	"github.com/usbarmory/tamago/dma"
+)
+
+func boot(kernel uint, params uint, cleanup func(), *dma.Region) (err error) {
 	panic("unimplemented")
 }
