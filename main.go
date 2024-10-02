@@ -33,8 +33,11 @@ var PublicKeyStr string
 func init() {
 	log.SetFlags(0)
 
-	if err := imx6ul.SetARMFreq(900); err != nil {
-		panic(fmt.Sprintf("cannot change ARM frequency, %v\n", err))
+	switch imx6ul.Model() {
+	case "i.MX6ULL", "i.MX6ULZ":
+		imx6ul.SetARMFreq(imx6ul.FreqMax)
+	case "i.MX6UL":
+		imx6ul.SetARMFreq(imx6ul.Freq528)
 	}
 }
 
