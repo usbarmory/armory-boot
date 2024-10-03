@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"github.com/dsoprea/go-ext4"
@@ -160,5 +159,5 @@ func (part *Partition) ReadAll(fullPath string) (buf []byte, err error) {
 	en := ext4.NewExtentNavigatorWithReadSeeker(part, inode)
 	r := ext4.NewInodeReader(en)
 
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }

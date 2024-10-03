@@ -18,7 +18,6 @@ package main
 import (
 	"errors"
 	"flag"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
@@ -227,7 +226,7 @@ func jumpAddress(addr uint32) (err error) {
 
 func writeAndJump(input string) {
 	log.Printf("parsing %s", input)
-	imx, err := ioutil.ReadFile(input)
+	imx, err := os.ReadFile(input)
 
 	if err != nil {
 		log.Fatal(err)
