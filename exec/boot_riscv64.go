@@ -11,6 +11,6 @@ import (
 	"github.com/usbarmory/tamago/dma"
 )
 
-func boot(kernel uint, params uint, cleanup func(), *dma.Region) (err error) {
+func boot(kernel uint, params uint, cleanup func(), _ *dma.Region) (err error) {
 	panic("unimplemented")
 }
