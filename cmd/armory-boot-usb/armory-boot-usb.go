@@ -50,6 +50,8 @@ const (
 // based SDP, only tested devices are listed as supported, Pull Requests are
 // welcome to expand this set.
 var supportedDevices = map[uint16]string{
+	0x0054: "Freescale SemiConductor Inc  SE Blank ARIK",
+	0x0061: "Freescale SemiConductor Inc  SP Blank RIGEL",
 	0x007d: "Freescale SemiConductor Inc  SE Blank 6UL",
 	0x0080: "Freescale SemiConductor Inc  SE Blank 6ULL",
 }
