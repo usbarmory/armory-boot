@@ -1,13 +1,13 @@
 module github.com/usbarmory/armory-boot
 
-go 1.23.1
+go 1.23.4
 
 require (
 	github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8
 	github.com/u-root/u-root v0.14.0
 	github.com/usbarmory/hid v0.0.0-20210318233634-85ced88a1ffe
-	github.com/usbarmory/tamago v0.0.0-20240924114619-273d67cd811d
-	golang.org/x/crypto v0.27.0
+	github.com/usbarmory/tamago v0.0.0-20241204113720-e648ef3a4633
+	golang.org/x/crypto v0.29.0
 )
 
 require (
@@ -18,5 +18,5 @@ require (
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
 )
