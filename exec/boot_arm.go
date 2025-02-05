@@ -1,7 +1,4 @@
-// https://github.com/usbarmory/armory-boot
-//
 // Copyright (c) WithSecure Corporation
-// https://foundry.withsecure.com
 //
 // Use of this source code is governed by the license
 // that can be found in the LICENSE file.
@@ -22,7 +19,7 @@ import (
 	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
 )
 
-// defined in boot.s
+// defined in boot_arm.s
 func svc()
 func exec()
 
