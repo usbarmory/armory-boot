@@ -3,12 +3,6 @@
 // Use of this source code is governed by the license
 // that can be found in the LICENSE file.
 
-// Package exec provides support for kernel image loading and booting on the
-// USB armory Mk II platform.
-//
-// This package is only meant to be used with `GOOS=tamago GOARCH=arm` as
-// supported by the TamaGo framework for bare metal Go, see
-// https://github.com/usbarmory/tamago.
 package exec
 
 import (
@@ -41,7 +35,9 @@ func boot(kernel uint, params uint, cleanup func(), region *dma.Region) (err err
 	_params = uint32(params)
 	_mmu = (region != nil)
 
-	cleanup()
+	if cleanup != nil {
+		cleanup()
+	}
 
 	if region != nil {
 		imx6ul.ARM.SetAttribute(
