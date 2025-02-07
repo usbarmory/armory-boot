@@ -24,6 +24,8 @@ const (
 
 // LinuxImage represents a bootable Linux kernel image.
 type LinuxImage struct {
+	// Memory is the system memory map
+	Memory []bzimage.E820Entry
 	// Region is the memory area for image loading.
 	Region *dma.Region
 
@@ -40,43 +42,11 @@ type LinuxImage struct {
 	loaded bool
 }
 
-func e820(start uint, size uint) (e820 []bzimage.E820Entry) {
-	var i int
-
-	e820 = make([]bzimage.E820Entry, 3)
-
-	// should always be usable (?)
-	e820[i] = bzimage.E820Entry{
-		Addr:    uint64(0x00000000),
-		Size:    uint64(0x0009f000),
-		MemType: bzimage.RAM,
-	}
-	i += 1
-
-	// amd64.ramStart, microvm.ramSize
-	e820[i] = bzimage.E820Entry{
-		Addr:    0x10000000,
-		Size:    0x40000000,
-		MemType: bzimage.RAM,
-	}
-	i += 1
-
-	e820[i] = bzimage.E820Entry{
-		Addr:    uint64(start),
-		Size:    uint64(size),
-		MemType: bzimage.RAM,
-	}
-	i += 1
-
-	return
-}
-
 // https://docs.kernel.org/arch/x86/zero-page.html
 func (image *LinuxImage) buildBootParams() (addr uint, err error) {
 	var buf []byte
 
 	start := image.Region.Start()
-	size := image.Region.Size()
 	addr = start + paramsOffset
 
 	params := &bzimage.LinuxParams{
@@ -90,7 +60,7 @@ func (image *LinuxImage) buildBootParams() (addr uint, err error) {
 		params.CmdLineSize = uint32(n)
 	}
 
-	for i, entry := range e820(start, size) {
+	for i, entry := range image.Memory {
 		params.E820Map[i] = entry
 		params.E820MapNr += uint8(i)
 	}
