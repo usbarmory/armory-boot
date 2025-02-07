@@ -39,8 +39,10 @@ type LinuxImage struct {
 	// CmdLine is the Linux kernel command line arguments.
 	CmdLine string
 
+	// DMA pointers
 	entry  uint
 	dtb    uint
+
 	loaded bool
 }
 
