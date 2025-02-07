@@ -7,7 +7,6 @@ package exec
 
 import (
 	"debug/elf"
-	_ "embed"
 	"errors"
 	"fmt"
 
