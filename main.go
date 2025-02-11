@@ -18,15 +18,6 @@ import (
 	"github.com/usbarmory/tamago/soc/nxp/usdhc"
 )
 
-var Build string
-var Revision string
-
-var Boot string
-var Start string
-
-// signify/minisign authentication when defined
-var PublicKeyStr string
-
 func init() {
 	log.SetFlags(0)
 
