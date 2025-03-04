@@ -59,9 +59,13 @@ func (image *LinuxImage) buildBootParams() (addr uint, err error) {
 		params.CmdLineSize = uint32(n)
 	}
 
+	if len(image.Memory) > bzimage.E820Max {
+		return 0, errors.New("image Memory is invalid")
+	}
+
 	for i, entry := range image.Memory {
 		params.E820Map[i] = entry
-		params.E820MapNr += uint8(i)
+		params.E820MapNr += 1
 	}
 
 	if buf, err = params.MarshalBinary(); err != nil {
