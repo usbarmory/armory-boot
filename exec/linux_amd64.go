@@ -17,19 +17,24 @@ import (
 
 const (
 	minProtocolVersion = 0x0205
-	cmdLineOffset      = 0
-	paramsOffset       = 0x1000
+
+	setupAreaSize = 0x1000000
+	cmdLineOffset = 0
+	paramsOffset  = 0x1000
 )
 
 // LinuxImage represents a bootable Linux kernel image.
 type LinuxImage struct {
+	// Kernel is the Linux kernel image.
+	Kernel []byte
+
 	// Memory is the system memory map
 	Memory []bzimage.E820Entry
 	// Region is the memory area for image loading.
 	Region *dma.Region
 
-	// Kernel is the Linux kernel image.
-	Kernel []byte
+	bzImage *bzimage.BzImage
+	elf     *elf.File
 
 	// CmdLine is the Linux kernel command line arguments.
 	CmdLine string
@@ -37,8 +42,6 @@ type LinuxImage struct {
 	// DMA pointers
 	entry  uint
 	params uint
-
-	loaded bool
 }
 
 // https://docs.kernel.org/arch/x86/zero-page.html
@@ -46,7 +49,6 @@ func (image *LinuxImage) buildBootParams() (addr uint, err error) {
 	var buf []byte
 
 	start := image.Region.Start()
-	addr = start + paramsOffset
 
 	params := &bzimage.LinuxParams{
 		MountRootReadonly: 0x01,
@@ -69,20 +71,18 @@ func (image *LinuxImage) buildBootParams() (addr uint, err error) {
 	}
 
 	if buf, err = params.MarshalBinary(); err != nil {
-		return
+		return 0, err
 	}
 
+	addr = start + paramsOffset
 	image.Region.Write(start, paramsOffset, buf)
 
 	return
 }
 
-// Load loads a Linux kernel image in memory.
-func (image *LinuxImage) Load() (err error) {
-	if image.Region == nil {
-		return errors.New("image memory Region must be assigned")
-	}
-
+// Parse parses a Linux kernel image and returns the minimum memory range for
+// its loading Region.
+func (image *LinuxImage) Parse() (start uint32, end uint32, err error) {
 	bzImage := &bzimage.BzImage{}
 
 	if err = bzImage.UnmarshalBinary(image.Kernel); err != nil {
@@ -90,24 +90,57 @@ func (image *LinuxImage) Load() (err error) {
 	}
 
 	if bzImage.Header.Protocolversion < minProtocolVersion {
-		return fmt.Errorf("unsupported boot protocol (%v)", bzImage.Header.Protocolversion)
+		return 0, 0, fmt.Errorf("unsupported boot protocol (%v)", bzImage.Header.Protocolversion)
 	}
 
 	if bzImage.Header.RelocatableKernel == 0 {
-		return errors.New("kernel must be relocatable")
+		return 0, 0, errors.New("kernel must be relocatable")
 	}
 
-	kelf, err := bzImage.ELF()
-
-	if err != nil {
+	if image.elf, err = bzImage.ELF(); err != nil {
 		return
 	}
 
-	image.entry = image.Region.Start() + uint(kelf.Entry)
+	start = 0xffffffff
+
+	for _, section := range image.elf.Sections {
+		if section.Type != elf.SHT_PROGBITS || section.Size == 0 {
+			continue
+		}
+
+		if off := uint32(section.Addr); off < start {
+			start = off
+		}
+
+		if off := uint32(section.Addr + section.Size); off > end {
+			end = off
+		}
+	}
+
+	image.entry = uint(start)
+	image.bzImage = bzImage
+
+	start -= setupAreaSize
+
+	return
+}
+
+// Load loads a Linux kernel in its Region field.
+func (image *LinuxImage) Load() (err error) {
+	if image.bzImage == nil {
+		if _, _, err = image.Parse(); err != nil {
+			return
+		}
+	}
+
+	if image.Region == nil {
+		return errors.New("image memory Region must be assigned")
+	}
+
 	start := image.Region.Start()
 
-	for _, section := range kelf.Sections {
-		if section.Type != elf.SHT_PROGBITS {
+	for _, section := range image.elf.Sections {
+		if section.Type != elf.SHT_PROGBITS || section.Size == 0 {
 			continue
 		}
 
@@ -117,14 +150,12 @@ func (image *LinuxImage) Load() (err error) {
 		i := section.Offset
 		j := i + section.Size
 
-		image.Region.Write(start, int(offset), bzImage.KernelCode[i:j])
+		image.Region.Write(start, int(offset), image.bzImage.KernelCode[i:j])
 	}
 
 	if image.params, err = image.buildBootParams(); err != nil {
 		return
 	}
-
-	image.loaded = true
 
 	return
 }
@@ -136,7 +167,7 @@ func (image *LinuxImage) Entry() uint {
 
 // Boot calls a loaded Linux kernel image.
 func (image *LinuxImage) Boot(cleanup func()) (err error) {
-	if !image.loaded {
+	if image.params == 0 {
 		return errors.New("Load() kernel before Boot()")
 	}
 

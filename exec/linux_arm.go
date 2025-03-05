@@ -42,8 +42,6 @@ type LinuxImage struct {
 	// DMA pointers
 	entry  uint
 	dtb    uint
-
-	loaded bool
 }
 
 func (image *LinuxImage) fdt() (fdt *dt.FDT, err error) {
@@ -150,7 +148,6 @@ func (image *LinuxImage) Load() (err error) {
 
 	image.entry = image.Region.Start() + uint(image.KernelOffset)
 	image.dtb = image.Region.Start() + uint(image.DeviceTreeBlobOffset)
-	image.loaded = true
 
 	return
 }
@@ -167,7 +164,7 @@ func (image *LinuxImage) DTB() uint {
 
 // Boot calls a loaded Linux kernel image.
 func (image *LinuxImage) Boot(cleanup func()) (err error) {
-	if !image.loaded {
+	if image.entry == 0 {
 		return errors.New("Load() kernel before Boot()")
 	}
 

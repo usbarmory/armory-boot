@@ -22,7 +22,6 @@ type ELFImage struct {
 	ELF []byte
 
 	entry  uint
-	loaded bool
 }
 
 // Load loads a bare-metal ELF image in memory.
@@ -65,7 +64,6 @@ func (image *ELFImage) Load() (err error) {
 	}
 
 	image.entry = uint(f.Entry)
-	image.loaded = true
 
 	return
 }
@@ -77,7 +75,7 @@ func (image *ELFImage) Entry() uint {
 
 // Boot calls a loaded bare-metal ELF image.
 func (image *ELFImage) Boot(cleanup func()) (err error) {
-	if !image.loaded {
+	if image.entry == 0 {
 		return errors.New("Load() kernel before Boot()")
 	}
 
