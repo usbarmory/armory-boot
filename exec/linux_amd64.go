@@ -80,9 +80,9 @@ func (image *LinuxImage) buildBootParams() (addr uint, err error) {
 	return
 }
 
-// Parse parses a Linux kernel image and returns the minimum memory range for
-// its loading Region.
-func (image *LinuxImage) Parse() (start uint32, end uint32, err error) {
+// Parse parses a Linux kernel image and returns a suitable memory range for
+// its loading Region allocation.
+func (image *LinuxImage) Parse() (start uint64, end uint64, err error) {
 	bzImage := &bzimage.BzImage{}
 
 	if err = bzImage.UnmarshalBinary(image.Kernel); err != nil {
@@ -108,12 +108,15 @@ func (image *LinuxImage) Parse() (start uint32, end uint32, err error) {
 			continue
 		}
 
-		if off := uint32(section.Addr); off < start {
-			start = off
+		// force address space below 4G
+		addr := section.Addr & 0xffffffff
+
+		if addr < start {
+			start = addr
 		}
 
-		if off := uint32(section.Addr + section.Size); off > end {
-			end = off
+		if e := addr + section.Size; e > end {
+			end = e
 		}
 	}
 
@@ -125,7 +128,7 @@ func (image *LinuxImage) Parse() (start uint32, end uint32, err error) {
 	return
 }
 
-// Load loads a Linux kernel in its Region field.
+// Load loads a Linux kernel in the memory area defined in the Region field.
 func (image *LinuxImage) Load() (err error) {
 	if image.bzImage == nil {
 		if _, _, err = image.Parse(); err != nil {
