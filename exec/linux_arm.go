@@ -40,8 +40,8 @@ type LinuxImage struct {
 	CmdLine string
 
 	// DMA pointers
-	entry  uint
-	dtb    uint
+	entry uint
+	dtb   uint
 }
 
 func (image *LinuxImage) fdt() (fdt *dt.FDT, err error) {

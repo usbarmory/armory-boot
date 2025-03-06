@@ -21,7 +21,7 @@ type ELFImage struct {
 	// ELF is a bootable bare-metal ELF image.
 	ELF []byte
 
-	entry  uint
+	entry uint
 }
 
 // Load loads a bare-metal ELF image in memory.
