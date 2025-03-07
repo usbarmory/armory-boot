@@ -6,7 +6,6 @@
 package exec
 
 import (
-	"debug/elf"
 	"errors"
 	"fmt"
 
@@ -16,8 +15,6 @@ import (
 )
 
 const (
-	// https://www.kernel.org/doc/Documentation/x86/x86_64/mm.txt
-	kernelStart = 0xffffffff80000000
 	// https://docs.kernel.org/arch/x86/boot.html
 	minProtocolVersion = 0x0205
 )
@@ -142,17 +139,11 @@ func (image *LinuxImage) Load() (err error) {
 		return
 	}
 
-	for _, section := range kelf.Sections {
-		if section.Type != elf.SHT_PROGBITS || section.Addr == 0 || section.Size == 0 {
-			continue
-		}
+	for _, p := range kelf.Progs {
+		buf := make([]byte, p.Filesz)
+		p.ReadAt(buf, 0)
 
-		offset := int(section.Addr - kernelStart)
-
-		i := section.Offset
-		j := i + section.Size
-
-		image.Region.Write(image.Region.Start(), image.KernelOffset+offset, bzImage.KernelCode[i:j])
+		image.Region.Write(image.Region.Start(), image.KernelOffset+int(p.Paddr), buf)
 	}
 
 	if err = image.buildBootParams(); err != nil {
