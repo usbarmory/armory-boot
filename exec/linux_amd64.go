@@ -70,6 +70,10 @@ func (image *LinuxImage) buildBootParams() (err error) {
 		params.CLPtr = uint32(start) + uint32(image.CmdLineOffset)
 		params.CmdLineSize = uint32(n)
 
+		if params.CmdLineSize > image.BzImage.Header.CmdLineSize {
+			return errors.New("incompatible command line length")
+		}
+
 		image.Region.Write(start, image.CmdLineOffset, []byte(image.CmdLine))
 	}
 
@@ -85,6 +89,10 @@ func (image *LinuxImage) buildBootParams() (err error) {
 	if n := len(image.InitialRamDisk); n > 0 {
 		params.Initrdstart = uint32(start) + uint32(image.InitialRamDiskOffset)
 		params.Initrdsize = uint32(n)
+
+		if params.Initrdstart > image.BzImage.Header.InitrdAddrMax {
+			return errors.New("incompatible initrd addres")
+		}
 
 		image.Region.Write(start, image.InitialRamDiskOffset, image.InitialRamDisk)
 	}
