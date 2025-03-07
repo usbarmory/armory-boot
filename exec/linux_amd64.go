@@ -34,6 +34,9 @@ type LinuxImage struct {
 	// KernelOffset is the Linux kernel offset from RAM start address.
 	KernelOffset int
 
+	// BzImage is the kernel extracted by by Parse() or Load().
+	BzImage *bzimage.BzImage
+
 	// InitialRamDisk is the Linux kernel initrd file.
 	InitialRamDisk []byte
 	// InitialRamDiskOffset is the initrd offset from RAM start address.
@@ -95,16 +98,26 @@ func (image *LinuxImage) buildBootParams() (err error) {
 	return
 }
 
+func (image *LinuxImage) Parse() (err error) {
+	if image.BzImage != nil {
+		return
+	}
+
+	image.BzImage = &bzimage.BzImage{}
+
+	return image.BzImage.UnmarshalBinary(image.Kernel)
+}
+
 // Load loads a Linux kernel image in memory.
 func (image *LinuxImage) Load() (err error) {
-	bzImage := &bzimage.BzImage{}
+	if err = image.Parse(); err != nil {
+		return
+	}
+
+	bzImage := image.BzImage
 
 	if image.Region == nil {
 		return errors.New("image memory Region must be assigned")
-	}
-
-	if err = bzImage.UnmarshalBinary(image.Kernel); err != nil {
-		return
 	}
 
 	if bzImage.Header.Protocolversion < minProtocolVersion {
