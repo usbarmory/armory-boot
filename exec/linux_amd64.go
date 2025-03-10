@@ -6,6 +6,8 @@
 package exec
 
 import (
+	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 
@@ -18,6 +20,35 @@ const (
 	// https://docs.kernel.org/arch/x86/boot.html
 	minProtocolVersion = 0x0205
 )
+
+// EFI Information (efi_info) signatures
+var (
+	// "EL64"
+	EFI64LoaderSignature = [4]byte{0x45, 0x4c, 0x36, 0x34}
+	// "EL32"
+	EFI32LoaderSignature = [4]byte{0x45, 0x4c, 0x33, 0x32}
+)
+
+const efiInfoOffset = 0x1c0
+
+// EFI represents the Linux Zero Page `efi_info` structure.
+type EFI struct {
+	LoaderSignature   [4]byte
+	SystemTable       uint32
+	MemoryDescSize    uint32
+	MemoryDescVersion uint32
+	MemoryMap         uint32
+	MemoryMapSize     uint32
+	SystemTableHigh   uint32
+	MemoryMapHigh     uint32
+}
+
+// MarshalBinary implements the [encoding.BinaryMarshaler] interface.
+func (d *EFI) MarshalBinary() (data []byte, err error) {
+	buf := new(bytes.Buffer)
+	err = binary.Write(buf, binary.LittleEndian, d)
+	return buf.Bytes(), nil
+}
 
 // LinuxImage represents a bootable Linux kernel image.
 type LinuxImage struct {
@@ -46,6 +77,8 @@ type LinuxImage struct {
 
 	// ParamsOffset is the boot parameters offset from RAM start address.
 	ParamsOffset int
+	// EFI is the boot parameters EFI information.
+	EFI *EFI
 
 	// DMA pointers
 	entry  uint
@@ -99,6 +132,12 @@ func (image *LinuxImage) buildBootParams() (err error) {
 	}
 
 	image.Region.Write(start, image.ParamsOffset, buf)
+
+	if buf, err = image.EFI.MarshalBinary(); err != nil {
+		return
+	}
+
+	image.Region.Write(start, image.ParamsOffset+efiInfoOffset, buf)
 
 	return
 }
