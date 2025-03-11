@@ -201,7 +201,7 @@ func (image *LinuxImage) buildBootParams() (err error) {
 }
 
 func (image *LinuxImage) Parse() (err error) {
-	if image.BzImage == nil {
+	if image.BzImage != nil {
 		return
 	}
 
