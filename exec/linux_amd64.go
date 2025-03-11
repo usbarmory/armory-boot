@@ -23,13 +23,15 @@ const (
 
 // EFI Information (efi_info) signatures
 var (
-	// "EL64"
-	EFI64LoaderSignature = [4]byte{0x45, 0x4c, 0x36, 0x34}
-	// "EL32"
-	EFI32LoaderSignature = [4]byte{0x45, 0x4c, 0x33, 0x32}
+	EFI64LoaderSignature = [4]byte{0x45, 0x4c, 0x36, 0x34} // "EL64"
+	EFI32LoaderSignature = [4]byte{0x45, 0x4c, 0x33, 0x32} // "EL32"
 )
 
-const efiInfoOffset = 0x1c0
+// https://docs.kernel.org/arch/x86/zero-page.html
+const (
+	screenInfoOffset = 0x00
+	efiInfoOffset    = 0x1c0
+)
 
 // EFI represents the Linux Zero Page `efi_info` structure.
 type EFI struct {
@@ -45,6 +47,49 @@ type EFI struct {
 
 // MarshalBinary implements the [encoding.BinaryMarshaler] interface.
 func (d *EFI) MarshalBinary() (data []byte, err error) {
+	buf := new(bytes.Buffer)
+	err = binary.Write(buf, binary.LittleEndian, d)
+	return buf.Bytes(), nil
+}
+
+// Screen represents the Linux Zero Page `screen_info` structure.
+type Screen struct {
+	Origx           uint8
+	Origy           uint8
+	ExtMemK         uint16
+	OrigVideoPage   uint16
+	OrigVideoMode   uint8
+	OrigVideoCols   uint8
+	_               uint16
+	OrigVideoeGabx  uint16
+	_               uint16
+	OrigVideoLines  uint8
+	OrigVideoIsVGA  uint8
+	OrigVideoPoints uint16
+	Lfbwidth        uint16
+	Lfbheight       uint16
+	Lfbdepth        uint16
+	Lfbbase         uint32
+	Lfbsize         uint32
+	CLMagic         uint16
+	CLOffset        uint16
+	Lfblinelength   uint16
+	Redsize         uint8
+	Redpos          uint8
+	Greensize       uint8
+	Greenpos        uint8
+	Bluesize        uint8
+	Bluepos         uint8
+	Rsvdsize        uint8
+	Rsvdpos         uint8
+	Vesapmseg       uint16
+	Vesapmoff       uint16
+	Pages           uint16
+	_               [12]uint8
+}
+
+// MarshalBinary implements the [encoding.BinaryMarshaler] interface.
+func (d *Screen) MarshalBinary() (data []byte, err error) {
 	buf := new(bytes.Buffer)
 	err = binary.Write(buf, binary.LittleEndian, d)
 	return buf.Bytes(), nil
@@ -77,8 +122,11 @@ type LinuxImage struct {
 
 	// ParamsOffset is the boot parameters offset from RAM start address.
 	ParamsOffset int
+
 	// EFI is the boot parameters EFI information.
 	EFI *EFI
+	// Screen is the boot parameters frame buffer information.
+	Screen *Screen
 
 	// DMA pointers
 	entry  uint
@@ -133,22 +181,31 @@ func (image *LinuxImage) buildBootParams() (err error) {
 
 	image.Region.Write(start, image.ParamsOffset, buf)
 
-	if buf, err = image.EFI.MarshalBinary(); err != nil {
-		return
+	if image.EFI != nil {
+		if buf, err = image.EFI.MarshalBinary(); err != nil {
+			return
+		}
+
+		image.Region.Write(start, image.ParamsOffset+efiInfoOffset, buf)
 	}
 
-	image.Region.Write(start, image.ParamsOffset+efiInfoOffset, buf)
+	if image.Screen != nil {
+		if buf, err = image.Screen.MarshalBinary(); err != nil {
+			return
+		}
+
+		image.Region.Write(start, image.ParamsOffset+screenInfoOffset, buf)
+	}
 
 	return
 }
 
 func (image *LinuxImage) Parse() (err error) {
-	if image.BzImage != nil {
+	if image.BzImage == nil {
 		return
 	}
 
 	image.BzImage = &bzimage.BzImage{}
-
 	return image.BzImage.UnmarshalBinary(image.Kernel)
 }
 
