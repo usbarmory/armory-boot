@@ -57,8 +57,8 @@ func (d *EFI) MarshalBinary() (data []byte, err error) {
 
 // Screen represents the Linux Zero Page `screen_info` structure.
 type Screen struct {
-	Origx           uint8
-	Origy           uint8
+	OrigX           uint8
+	OrigY           uint8
 	ExtMemK         uint16
 	OrigVideoPage   uint16
 	OrigVideoMode   uint8
@@ -69,26 +69,29 @@ type Screen struct {
 	OrigVideoLines  uint8
 	OrigVideoIsVGA  uint8
 	OrigVideoPoints uint16
-	Lfbwidth        uint16
-	Lfbheight       uint16
-	Lfbdepth        uint16
-	Lfbbase         uint32
-	Lfbsize         uint32
+	LfbWidth        uint16
+	LfbHeight       uint16
+	LfbDepth        uint16
+	LfbBase         uint32
+	LfbSize         uint32
 	CLMagic         uint16
 	CLOffset        uint16
-	Lfblinelength   uint16
-	Redsize         uint8
-	Redpos          uint8
-	Greensize       uint8
-	Greenpos        uint8
-	Bluesize        uint8
-	Bluepos         uint8
-	Rsvdsize        uint8
-	Rsvdpos         uint8
-	Vesapmseg       uint16
-	Vesapmoff       uint16
+	LfbLineLength   uint16
+	RedSize         uint8
+	RedPos          uint8
+	GreenSize       uint8
+	GreenPos        uint8
+	BlueSize        uint8
+	BluePos         uint8
+	RsvdSize        uint8
+	RsvdPos         uint8
+	VesapmSeg       uint16
+	VesapmOff       uint16
 	Pages           uint16
-	_               [12]uint8
+	VesaAttributes  uint16
+	Capabilities    uint32
+	ExtLfbBase      uint32
+	_               [2]uint8
 }
 
 // MarshalBinary implements the [encoding.BinaryMarshaler] interface.
