@@ -16,21 +16,24 @@ import (
 	"github.com/u-root/u-root/pkg/boot/bzimage"
 )
 
+// Linux kernel information
 const (
 	// https://docs.kernel.org/arch/x86/boot.html
-	minProtocolVersion = 0x0205
+	MinProtocolVersion = 0x0205
+	// https://github.com/torvalds/linux/blob/master/include/uapi/linux/screen_info.h
+	VideoTypeEFI = 0x70
+)
+
+// Zero page offsets (https://docs.kernel.org/arch/x86/zero-page.html)
+const (
+	screenInfoOffset = 0x00
+	efiInfoOffset    = 0x1c0
 )
 
 // EFI Information (efi_info) signatures
 var (
 	EFI64LoaderSignature = [4]byte{0x45, 0x4c, 0x36, 0x34} // "EL64"
 	EFI32LoaderSignature = [4]byte{0x45, 0x4c, 0x33, 0x32} // "EL32"
-)
-
-// https://docs.kernel.org/arch/x86/zero-page.html
-const (
-	screenInfoOffset = 0x00
-	efiInfoOffset    = 0x1c0
 )
 
 // EFI represents the Linux Zero Page `efi_info` structure.
@@ -221,7 +224,7 @@ func (image *LinuxImage) Load() (err error) {
 		return errors.New("image memory Region must be assigned")
 	}
 
-	if bzImage.Header.Protocolversion < minProtocolVersion {
+	if bzImage.Header.Protocolversion < MinProtocolVersion {
 		return fmt.Errorf("unsupported boot protocol (%v)", bzImage.Header.Protocolversion)
 	}
 
