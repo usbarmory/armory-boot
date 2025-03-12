@@ -17,17 +17,23 @@ import (
 )
 
 // Linux kernel information
+// https://docs.kernel.org/arch/x86/boot.html
 const (
-	// https://docs.kernel.org/arch/x86/boot.html
-	MinProtocolVersion = 0x0205
-	// https://github.com/torvalds/linux/blob/master/include/uapi/linux/screen_info.h
-	VideoTypeEFI = 0x70
+	MinProtocolVersion = 0x0205 // https://docs.kernel.org/arch/x86/boot.html
 )
 
-// Zero page offsets (https://docs.kernel.org/arch/x86/zero-page.html)
+// Zero page offsets
+// https://docs.kernel.org/arch/x86/zero-page.html
 const (
 	screenInfoOffset = 0x00
 	efiInfoOffset    = 0x1c0
+)
+
+// Screen information
+// https://github.com/torvalds/linux/blob/master/include/uapi/linux/screen_info.h
+const (
+	VideoTypeEFI   = 0x70
+	Video64BitBase = 1 << 1
 )
 
 // EFI Information (efi_info) signatures
