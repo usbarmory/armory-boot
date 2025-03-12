@@ -155,7 +155,7 @@ func (image *LinuxImage) buildBootParams() (err error) {
 			return errors.New("incompatible command line length")
 		}
 
-		image.Region.Write(start, image.CmdLineOffset, []byte(image.CmdLine))
+		image.Region.Write(start, image.CmdLineOffset, []byte(image.CmdLine + "\x00"))
 	}
 
 	if len(image.Memory) > bzimage.E820Max {
