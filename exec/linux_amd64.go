@@ -233,6 +233,10 @@ func (image *LinuxImage) Load() (err error) {
 		return errors.New("image memory Region must be assigned")
 	}
 
+	if image.Region.Start() >= (1 << 32) {
+		return errors.New("image memory Region above 4G not yet supported")
+	}
+
 	if bzImage.Header.Protocolversion < MinProtocolVersion {
 		return fmt.Errorf("unsupported boot protocol (%v)", bzImage.Header.Protocolversion)
 	}
