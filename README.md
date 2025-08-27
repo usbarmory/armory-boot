@@ -240,7 +240,7 @@ License
 =======
 
 armory-boot | https://github.com/usbarmory/armory-boot  
-Copyright (c) WithSecure Corporation
+Copyright (c) The armory-boot authors. All Rights Reserved.
 
 These source files are distributed under the BSD-style license found in the
 [LICENSE](https://github.com/usbarmory/armory-boot/blob/master/LICENSE) file.

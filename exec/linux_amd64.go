@@ -1,4 +1,4 @@
-// Copyright (c) WithSecure Corporation
+// Copyright (c) The armory-boot authors. All Rights Reserved.
 //
 // Use of this source code is governed by the license
 // that can be found in the LICENSE file.
@@ -164,7 +164,7 @@ func (image *LinuxImage) buildBootParams() (err error) {
 			return errors.New("incompatible command line length")
 		}
 
-		image.Region.Write(start, image.CmdLineOffset, []byte(image.CmdLine + "\x00"))
+		image.Region.Write(start, image.CmdLineOffset, []byte(image.CmdLine+"\x00"))
 	}
 
 	if len(image.Memory) > bzimage.E820Max {
