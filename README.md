@@ -6,8 +6,27 @@ acts as a primary boot loader for the [USB armory Mk II](https://github.com/usba
 allowing boot of kernel images (e.g. Linux) from either the eMMC card or an
 external microSD card.
 
-This repository also provides a [command line utility](https://github.com/usbarmory/armory-boot#serial-download-protocol-utility)
-to load imx executables through USB using [SDP](https://github.com/usbarmory/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp).
+This repository also provides a
+[command line utility](https://github.com/usbarmory/armory-boot#serial-download-protocol-utility)
+to load imx executables through USB using
+[SDP](https://github.com/usbarmory/usbarmory/wiki/Boot-Modes-(Mk-II)#serial-download-protocol-sdp)
+as well as the following libraries:.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/armory-boot/armory-boot.svg)](https://pkg.go.dev/github.com/usbarmory/armory-boot)
+
+* Package [config](https://pkg.go.dev/github.com/usbarmory/armory-boot/config)
+  provides parsing for the armory-boot configuration file format.
+
+* Package [disk](https://pkg.go.dev/github.com/usbarmory/armory-boot/disk)
+  provides support for SD/MMC card ext4 partition access.
+
+* Package [exec](https://pkg.go.dev/github.com/usbarmory/armory-boot/exec)
+  provides support for kernel image loading and booting in bare metal Go
+  applications.
+
+* Package [sdp](https://pkg.go.dev/github.com/usbarmory/armory-boot/sdp)
+  provides helpers for implementing the Serial Download Protocol (SDP), used on
+  NXP i.MX System-on-Chip (SoC) application processors.
 
 Compiling
 =========

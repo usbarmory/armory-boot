@@ -3,7 +3,7 @@
 // Use of this source code is governed by the license
 // that can be found in the LICENSE file.
 
-// Package sdp provide helpers for implementing the Serial Download Protocol
+// Package sdp provides helpers for implementing the Serial Download Protocol
 // (SDP), used on NXP i.MX System-on-Chip (SoC) application processors.
 package sdp
 
