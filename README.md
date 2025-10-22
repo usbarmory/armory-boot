@@ -193,6 +193,13 @@ Example signature generation (minisign):
 minisign -S -s armory-boot.sec -m armory-boot.conf -x armory-boot.conf.sig
 ```
 
+Boot Transparency
+=================
+
+The support of
+[boot-transparency](https://github.com/usbarmory/boot-transparency) is planned
+for future releases.
+
 LED status
 ==========
 
