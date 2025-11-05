@@ -39,10 +39,10 @@ RUN rm -r minisign*
 ENV HABTOOL_VERSION="v2022.05.25"
 RUN su - $USER -c "/usr/local/tamago-go/bin/go install github.com/usbarmory/crucible/cmd/habtool@${HABTOOL_VERSION}"
 
-ENV GOPATH "/home/${USER}/go"
-ENV USBARMORY_GIT "/home/${USER}/usbarmory"
-ENV TAMAGO "/usr/local/tamago-go/bin/go"
-ENV PATH "${PATH}:${GOPATH}/bin:/usr/local/tamago-go/bin"
+ENV GOPATH="/home/${USER}/go"
+ENV USBARMORY_GIT="/home/${USER}/usbarmory"
+ENV TAMAGO="/usr/local/tamago-go/bin/go"
+ENV PATH="${PATH}:${GOPATH}/bin:/usr/local/tamago-go/bin"
 
 USER $USER
 WORKDIR /build
