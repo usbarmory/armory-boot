@@ -43,10 +43,35 @@ Pre-compiled binaries for Linux and Windows are released
 [here](https://github.com/usbarmory/armory-boot/releases).
 
 The utility is meant to be used on devices running in
-[USB SDP mode](https://github.com/usbarmory/usbarmory/wiki/Boot-Modes-(Mk-II)):
+[USB SDP mode](https://github.com/usbarmory/usbarmory/wiki/Boot-Modes-(Mk-II)).
+
+Permissions
+===========
+
+On Linux, the tool requires access to the HID device through `/dev/hidraw*`
+nodes. By default, these nodes are only accessible by the root user.
+
+To allow non-root access (e.g. for users in the `plugdev` group), create a
+file named `/etc/udev/rules.d/99-imx-usb.rules` with the following content:
+
+```udev
+# i.MX 6ULL/7ULP/8M Serial Download Protocol (SDP)
+SUBSYSTEM=="usb", ATTR{idVendor}=="15a2", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="15a2", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+```
+
+After creating the file, reload the rules:
 
 ```
-sudo armory-boot-usb -i armory-boot.imx
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+Usage
+=====
+
+```
+armory-boot-usb -i armory-boot.imx
 found device 15a2:0080 Freescale SemiConductor Inc  SE Blank 6ULL
 parsing armory-boot.imx
 loading DCD at 0x00910000 (952 bytes)
