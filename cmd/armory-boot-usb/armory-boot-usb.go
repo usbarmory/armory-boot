@@ -106,7 +106,7 @@ func detect() (err error) {
 	}
 
 	if conf.dev == nil {
-		return errors.New("no device found, target missing or invalid permissions (forgot admin shell?)")
+		return errors.New("no device found, target missing or invalid permissions (check udev rules or use sudo)")
 	}
 
 	return
