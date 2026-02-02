@@ -20,7 +20,6 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"runtime"
 	"time"
 
 	"github.com/usbarmory/armory-boot/sdp"
@@ -178,39 +177,13 @@ func fileWrite(imx []byte, addr uint32) (err error) {
 	}
 
 	resID := -1
-	timer := time.After(time.Duration(conf.timeout) * time.Second)
 
 	for i, r := range r2 {
 		if i == len(r2)-1 {
 			resID = D2H_RESPONSE_LAST
 		}
-	send:
-		_, err = sendHIDReport(H2D_DATA, r, resID, -1)
 
-		if err != nil && runtime.GOOS == "darwin" && err.Error() == "hid: general error" {
-			// On macOS access contention with the OS causes
-			// errors, as a workaround we retry from the transfer
-			// that got caught up.
-			select {
-			case <-timer:
-				return
-			default:
-				off := uint32(i) * 1024
-				r1 := &sdp.SDP{
-					CommandType: sdp.WriteFile,
-					Address:     addr + off,
-					DataCount:   uint32(len(imx)) - off,
-				}
-
-				if _, err = sendHIDReport(H2D_COMMAND, r1.Bytes(), -1, -1); err != nil {
-					return
-				}
-
-				goto send
-			}
-		}
-
-		if err != nil {
+		if _, err = sendHIDReport(H2D_DATA, r, resID, -1); err != nil {
 			break
 		}
 	}
