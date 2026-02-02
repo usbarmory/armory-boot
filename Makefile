@@ -45,9 +45,9 @@ $(APP)-usb:
 $(APP)-usb.exe: BUILD_OPTS := GOOS=windows CGO_ENABLED=1 CXX=x86_64-w64-mingw32-g++ CC=x86_64-w64-mingw32-gcc
 $(APP)-usb.exe:
 	@if [ "${TAMAGO}" != "" ]; then \
-		$(BUILD_OPTS) ${TAMAGO} build cmd/$(APP)-usb/*.go; \
+		$(BUILD_OPTS) ${TAMAGO} build cmd/$(APP)-usb/$(APP)-usb.go; \
 	else \
-		$(BUILD_OPTS) go build cmd/$(APP)-usb/*.go; \
+		$(BUILD_OPTS) go build cmd/$(APP)-usb/$(APP)$(APP)-usb.go; \
 	fi
 
 #### utilities ####
