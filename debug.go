@@ -32,7 +32,7 @@ func init() {
 	log.Printf("%s", banner)
 }
 
-//go:linkname printk runtime.printk
+//go:linkname printk runtime/goos.Printk
 func printk(c byte) {
 	usbarmory.UART2.Tx(c)
 }

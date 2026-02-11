@@ -14,10 +14,10 @@ import (
 // Override imx6ul.ramStart, usbarmory.ramSize and dma allocation, as the
 // mapped kernel image needs to be within the first 128MiB of RAM.
 
-//go:linkname ramStart runtime.ramStart
+//go:linkname ramStart runtime/goos.RamStart
 var ramStart uint32 = 0x90000000
 
-//go:linkname ramSize runtime.ramSize
+//go:linkname ramSize runtime/goos.RamSize
 var ramSize uint32 = 0x08000000
 
 // DMA region for target kernel boot
