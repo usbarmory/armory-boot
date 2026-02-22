@@ -86,11 +86,7 @@ func BuildFileWriteReport(imx []byte, addr uint32) (r1 []byte, r2 [][]byte) {
 	binary.LittleEndian.PutUint32(imx[DCDOffset:], 0)
 
 	for j := 0; j < len(imx); j += HIDReportSize {
-		k := j + HIDReportSize
-
-		if k > len(imx) {
-			k = len(imx)
-		}
+		k := min(j+HIDReportSize, len(imx))
 
 		r2 = append(r2, imx[j:k])
 	}
