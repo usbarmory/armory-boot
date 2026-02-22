@@ -2,6 +2,8 @@ module github.com/usbarmory/armory-boot
 
 go 1.26.0
 
+tool github.com/usbarmory/tamago/cmd/tamago
+
 require (
 	github.com/dsoprea/go-ext4 v0.0.0-20190528173430-c13b09fc0ff8
 	github.com/u-root/u-root v0.15.0

@@ -31,10 +31,13 @@ as well as the following libraries:.
 Compiling
 =========
 
-Build the [TamaGo compiler](https://github.com/usbarmory/tamago-go)
-(or use the [latest binary release](https://github.com/usbarmory/tamago-go/releases/latest)):
+The [TamaGo compiler](https://github.com/usbarmory/tamago-go) is automatically
+downloaded and compiled as a `go tool` by the `Makefile`.
 
-```
+Alternatively the `TAMAGO` environment variable can overridden to use the
+[latest binary release](https://github.com/usbarmory/tamago-go/releases/latest):
+
+```sh
 wget https://github.com/usbarmory/tamago-go/archive/refs/tags/latest.zip
 unzip latest.zip
 cd tamago-go-latest/src && ./all.bash
