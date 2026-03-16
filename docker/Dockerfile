@@ -20,8 +20,8 @@ ENV TZ=Europe/Rome
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # install tamago-go
-ENV TAMAGO_VERSION="1.25.3"
-ENV TAMAGO_CHECKSUM="fd7a83116b8fd1104eebbc0dd087f405f2e522f75731a2dd334afef38be3742e"
+ENV TAMAGO_VERSION="1.26.1"
+ENV TAMAGO_CHECKSUM="09be4aecf0412d956defa10ba83b6bf3532f17304b1c4dd3ea38bbb92108f669"
 RUN wget -O tamago-go.tgz https://github.com/usbarmory/tamago-go/releases/download/tamago-go${TAMAGO_VERSION}/tamago-go${TAMAGO_VERSION}.linux-amd64.tar.gz
 RUN echo "${TAMAGO_CHECKSUM} tamago-go.tgz" | sha256sum --strict --check -
 RUN tar -C / -xzf tamago-go.tgz && rm tamago-go.tgz
