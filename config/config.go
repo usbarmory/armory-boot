@@ -112,10 +112,6 @@ func (c *Config) init(part *disk.Partition) (err error) {
 		return fmt.Errorf("invalid path %s, %v", kernelPath, err)
 	}
 
-	if err != nil {
-		return fmt.Errorf("invalid path %s, %v", c.DeviceTreeBlobPath[0], err)
-	}
-
 	if isUnikernel {
 		c.ELF = true
 	}
@@ -168,12 +164,12 @@ func Load(part *disk.Partition, configPath string, sigPath string, pubKey string
 		return
 	}
 
-	if len(c.dtb) > 0 && !CompareHash(c.dtb, c.dtbHash) {
+	if len(c.DeviceTreeBlobPath) == 2 && !CompareHash(c.dtb, c.dtbHash) {
 		err = errors.New("invalid dtb hash")
 		return
 	}
 
-	if len(c.initrd) > 0 && !CompareHash(c.initrd, c.initrdHash) {
+	if len(c.InitialRamDiskPath) == 2 && !CompareHash(c.initrd, c.initrdHash) {
 		err = errors.New("invalid initrd hash")
 		return
 	}
