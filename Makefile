@@ -12,6 +12,8 @@ REV = $(shell git rev-parse --short HEAD 2> /dev/null)
 
 SHELL = /bin/bash
 START ?= 5242880
+CONFIG_PATH ?= /boot/armory-boot.conf
+SIGNATURE_PATH ?= ${CONFIG_PATH}.sig
 
 ifeq ("${CONSOLE}","on")
 	BUILD_TAGS := ${BUILD_TAGS},console
@@ -21,7 +23,7 @@ APP := armory-boot
 GOENV := GO_EXTLINK_ENABLED=0 CGO_ENABLED=0 GOOS=tamago GOOSPKG=github.com/usbarmory/tamago GOARM=7 GOARCH=arm
 TEXT_START := 0x90010000 # ramStart (defined in imx6/imx6ul/memory.go) + 0x10000
 TAMAGO ?= $(shell go tool -n github.com/usbarmory/tamago/cmd/tamago)
-TAMAGOFLAGS := -tags ${BUILD_TAGS} -trimpath -ldflags "-T $(TEXT_START) -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
+TAMAGOFLAGS := -tags ${BUILD_TAGS} -trimpath -ldflags "-T $(TEXT_START) -R 0x1000 -X 'main.Build=${BUILD}' -X 'main.Revision=${REV}' -X 'main.Boot=${BOOT}' -X 'main.Start=${START}' -X 'main.ConfigPath=${CONFIG_PATH}' -X 'main.SignaturePath=${SIGNATURE_PATH}' -X 'main.PublicKeyStr=${PUBLIC_KEY}'"
 GOFLAGS := -trimpath -ldflags "-s -w"
 
 .PHONY: clean
