@@ -43,29 +43,25 @@ unzip latest.zip
 cd tamago-go-latest/src && ./all.bash
 cd ../bin && export TAMAGO=`pwd`/go
 ```
+The following environment variables configure the `armory-boot.imx` binary
+build:
 
-The `BOOT` environment variable must be set to either `uSD` or `eMMC` to
-configure the bootloader media for the configuration file, as well as kernel
-images, location.
+* `BOOT`: must be set to either `uSD` or `eMMC` to configure the bootloader
+  media for the configuration file and kernel images location.
 
-The `START` environment variable must be set to the offset of the first valid
-ext4 partition where the configuration file is located (typically 5242880 for
-USB armory Mk II default pre-compiled images).
+* `START`: must be set to the offset of the first valid ext4 partition where
+  the configuration file is located, it defaults to 5242880 (compatible with
+  USB armory Mk II default pre-compiled images).
 
-The `CONFIG_PATH` environment variable must contain the path of the
-configuration file (typically `/boot/armory-boot.conf` for single partition
-systems or `/armory-boot.conf` for systems implementing FDE with a separate
-boot partition).
+* `CONFIG_PATH`: must be set to the path of the configuration file, it
+  defaults to `/boot/armory-boot.conf`.
 
-The `SIGNATURE_PATH` environment variable must contain the path of the file
-containing the signature of the configuration file (typically
-`/boot/armory-boot.conf.sig` for single partition systems or
-`/armory-boot.conf.sig` for systems implementing FDE with a separate boot
-partition).
+* `SIGNATURE_PATH`: must be set to the path of the file containing the signature of the configuration file,
+  it defaults to `/boot/armory-boot.conf.sig`.
 
-The `CONSOLE` environment variable may be set to `on` to enable serial
-logging when a [debug accessory](https://github.com/usbarmory/usbarmory/tree/master/hardware/mark-two-debug-accessory)
-is connected.
+* `CONSOLE`: may be set to `on` to enable serial logging when a [debug
+  accessory](https://github.com/usbarmory/usbarmory/tree/master/hardware/mark-two-debug-accessory)
+  is connected.
 
 Build the `armory-boot.imx` application executable:
 
