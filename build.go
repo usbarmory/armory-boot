@@ -15,6 +15,10 @@ var (
 	Boot  string
 	Start string
 
+	// Configuration file
+	ConfigPath string
+	SignaturePath string
+
 	// Authentication key
 	PublicKeyStr string
 )

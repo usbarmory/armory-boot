@@ -61,7 +61,7 @@ func main() {
 		log.Printf("armory-boot: no public key, skipping signature verification")
 	}
 
-	conf, err := config.Load(part, config.DefaultConfigPath, config.DefaultSignaturePath, PublicKeyStr)
+	conf, err := config.Load(part, ConfigPath, SignaturePath, PublicKeyStr)
 
 	if err != nil {
 		panic(fmt.Sprintf("configuration error, %v\n", err))

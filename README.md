@@ -43,24 +43,31 @@ unzip latest.zip
 cd tamago-go-latest/src && ./all.bash
 cd ../bin && export TAMAGO=`pwd`/go
 ```
+The following environment variables configure the `armory-boot.imx` binary
+build:
 
-The `BOOT` environment variable must be set to either `uSD` or `eMMC` to
-configure the bootloader media for `/boot/armory-boot.conf`, as well as kernel
-images, location.
+* `BOOT`: must be set to either `uSD` or `eMMC` to configure the bootloader
+  media for the configuration file and kernel images location.
 
-The `START` environment variable must be set to the offset of the first valid
-ext4 partition where `/boot/armory-boot.conf` is located (typically 5242880 for
-USB armory Mk II default pre-compiled images).
+* `START`: must be set to the offset of the first valid ext4 partition where
+  the configuration file is located, it defaults to 5242880 (compatible with
+  USB armory Mk II default pre-compiled images).
 
-The `CONSOLE` environment variable may be set to `on` to enable serial
-logging when a [debug accessory](https://github.com/usbarmory/usbarmory/tree/master/hardware/mark-two-debug-accessory)
-is connected.
+* `CONFIG_PATH`: must be set to the path of the configuration file, it
+  defaults to `/boot/armory-boot.conf`.
+
+* `SIGNATURE_PATH`: must be set to the path of the file containing the signature of the configuration file,
+  it defaults to `/boot/armory-boot.conf.sig`.
+
+* `CONSOLE`: may be set to `on` to enable serial logging when a [debug
+  accessory](https://github.com/usbarmory/usbarmory/tree/master/hardware/mark-two-debug-accessory)
+  is connected.
 
 Build the `armory-boot.imx` application executable:
 
 ```
 git clone https://github.com/usbarmory/armory-boot && cd armory-boot
-make imx BOOT=uSD START=5242880
+make imx BOOT=uSD START=5242880 CONFIG_PATH=/boot/armory-boot.conf SIGNATURE_PATH=/boot/armory-boot.conf.sig
 ```
 
 Docker
@@ -112,7 +119,7 @@ Boot_), as well as the kernel command line.
 
 An optional initial ramdisk can be passed with the `initrd` parameter.
 
-Example `/boot/armory-boot.conf` configuration file for loading a Linux kernel:
+Example configuration file for loading a Linux kernel:
 
 ```
 {
@@ -139,8 +146,7 @@ To load a TamaGo unikernel, the bootloader only needs the path to the ELF
 binary along with its SHA256 hash (only used with configuration signature
 verification, see _Secure Boot_).
 
-Example `/boot/armory-boot.conf` configuration file for loading a TamaGo
-unikernel:
+Example configuration file for loading a TamaGo unikernel:
 
 ```
 {
@@ -177,11 +183,11 @@ minisign -G -p armory-boot.pub -s armory-boot.sec
 Compilation with embedded key:
 
 ```
-make imx_signed BOOT=uSD START=5242880 PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
+make imx_signed BOOT=uSD START=5242880 CONFIG_PATH=/boot/armory-boot.conf SIGNATURE_PATH=/boot/armory-boot.conf.sig PUBLIC_KEY=<last line of armory-boot.pub> HAB_KEYS=<path>
 ```
 
 When `armory-boot` is compiled with the `PUBLIC_KEY` variable, a signature for
-the configuration file must be created in `/boot/armory-boot.conf.sig` using
+the configuration file must be created in file specified by `SIGNATURE_PATH` using
 with the corresponding secret key.
 
 Example signature generation (signify):

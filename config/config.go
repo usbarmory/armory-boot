@@ -16,13 +16,6 @@ import (
 	"github.com/usbarmory/armory-boot/disk"
 )
 
-// DefaultConfigPath is the default armory-boot configuration file path.
-const DefaultConfigPath = "/boot/armory-boot.conf"
-
-// DefaultSignaturePath is the default armory-boot configuration file signature
-// path.
-const DefaultSignaturePath = "/boot/armory-boot.conf.sig"
-
 // Config represents the armory-boot configuration.
 type Config struct {
 	// KernelPath is the path to a Linux kernel image.
