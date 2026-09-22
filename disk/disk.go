@@ -13,9 +13,6 @@ import (
 	"github.com/usbarmory/tamago/soc/nxp/usdhc"
 )
 
-// DefaultBootDevice is the default boot device
-const DefaultBootDevice = "uSD"
-
 // DefaultOffset is the default start offset of the ext4 partition
 const DefaultOffset = 5242880
 
