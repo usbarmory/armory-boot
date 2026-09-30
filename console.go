@@ -13,6 +13,7 @@ import (
 	"log"
 	_ "unsafe"
 
+	usbarmory "github.com/usbarmory/tamago/board/usbarmory/mk2"
 	"github.com/usbarmory/tamago/soc/nxp/imx6ul"
 )
 
@@ -33,6 +34,8 @@ func init() {
 	imx6ul.UART2.Disable()
 	// silence logging
 	log.SetOutput(io.Discard)
+	// enable USB receptacle
+	usbarmory.EnableReceptacleController()
 }
 
 //go:linkname printk runtime/goos.Printk
