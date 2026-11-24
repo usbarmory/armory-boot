@@ -17,7 +17,6 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"log"
 	"math/big"
 	"os"
@@ -247,10 +246,11 @@ func main() {
 	var err error
 
 	flag.Parse()
+
 	if flag.NArg() > 0 {
-		fmt.Fprintf(os.Stderr, "Unexpected arguments: %q\n", flag.Args())
+		log.Printf("arguments provided but not expected\n")
 		flag.Usage()
-		os.Exit(1)
+		return
 	}
 
 	if err = detect(); err != nil {
