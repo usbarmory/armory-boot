@@ -247,6 +247,7 @@ func main() {
 	var err error
 
 	flag.Parse()
+
 	if flag.NArg() > 0 {
 		fmt.Fprintf(os.Stderr, "Unexpected arguments: %q\n", flag.Args())
 		flag.Usage()
