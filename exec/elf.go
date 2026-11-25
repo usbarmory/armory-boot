@@ -81,3 +81,13 @@ func (image *ELFImage) Boot(cleanup func()) (err error) {
 
 	return boot(image.entry, 0, cleanup, image.Region)
 }
+
+// BootEFI calls a loaded bare-metal ELF image setting the argument UEFI
+// Handoff State.
+func (image *ELFImage) BootEFI(handle uint, table uint, cleanup func()) (err error) {
+	if image.entry == 0 {
+		return errors.New("Load() kernel before BootEFI()")
+	}
+
+	return boot_efi(image.entry, handle, table, cleanup)
+}

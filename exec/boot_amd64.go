@@ -13,6 +13,7 @@ import (
 
 // defined in boot_amd64.s
 func exec(kernel uint, params uint)
+func exec_efi(kernel uint, handle uint, table uint)
 
 func boot(kernel uint, params uint, cleanup func(), _ *dma.Region) (err error) {
 	if cleanup != nil {
@@ -20,6 +21,16 @@ func boot(kernel uint, params uint, cleanup func(), _ *dma.Region) (err error) {
 	}
 
 	exec(kernel, params)
+
+	return errors.New("boot failure")
+}
+
+func boot_efi(kernel uint, handle uint, table uint, cleanup func()) (err error) {
+	if cleanup != nil {
+		cleanup()
+	}
+
+	exec_efi(kernel, handle, table)
 
 	return errors.New("boot failure")
 }
